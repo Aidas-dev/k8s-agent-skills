@@ -2,6 +2,8 @@
 
 Agent skills for Kubernetes cluster operations tooling. Each skill is a self-contained `SKILL.md` designed for agentic AI tools (Claude Code, OpenCode, Codex) that load skills for task-specific expertise.
 
+**Mirror:** [github.com/Aidas-dev/k8s-agent-skills](https://github.com/Aidas-dev/k8s-agent-skills)
+
 ## Usage
 
 ### Via npm/bun (recommended)
