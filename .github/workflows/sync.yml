@@ -1,9 +1,15 @@
 name: Sync from Gitea
 
+# Syncs GitHub mirror with canonical Gitea source.
+# Triggered by: schedule (every 5min), manual, or after publish workflow
+
 on:
-  repository_dispatch:
-    types: [gitea-push]
+  schedule:
+    - cron: '*/5 * * * *'
   workflow_dispatch:
+  workflow_run:
+    workflows: [Publish to npm]
+    types: [completed]
 
 permissions:
   contents: write
@@ -22,4 +28,11 @@ jobs:
         run: |
           git remote add gitea https://aidmantas:${GITEA_TOKEN}@git.kubexa.tech/Aidas/k8s-agent-skills.git
           git fetch gitea main
-          git push origin gitea/main:main
+          LOCAL=$(git rev-parse main)
+          REMOTE=$(git rev-parse FETCH_HEAD)
+          if [ "$LOCAL" != "$REMOTE" ]; then
+            echo "Gitea ahead. Syncing..."
+            git push origin FETCH_HEAD:main
+          else
+            echo "Already in sync."
+          fi
