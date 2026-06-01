@@ -1,0 +1,71 @@
+name: Publish to npm
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - 'package.json'
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type (patch/minor/major)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Read current version
+        id: version
+        run: echo "current=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+
+      - name: Check if version already published
+        id: check
+        continue-on-error: true
+        run: |
+          published=$(npm view ${{ github.event.repository.name }}@${{ steps.version.outputs.current }} version 2>/dev/null || echo "")
+          if [ "$published" = "${{ steps.version.outputs.current }}" ]; then
+            echo "Version ${{ steps.version.outputs.current }} already published"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version ${{ steps.version.outputs.current }} not published yet"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Auto-bump version (workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          npm version ${{ inputs.bump }} -m "chore: bump version to %s [skip ci]"
+          echo "new_version=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+        id: bump
+
+      - name: Publish to npm
+        if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push version bump commit back
+        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.new_version != ''
+        run: git push
