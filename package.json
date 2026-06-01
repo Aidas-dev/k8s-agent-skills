@@ -1,6 +1,6 @@
 {
   "name": "k8s-agent-skills",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "Agent skills for Kubernetes cluster operations — Cilium, Talos, Flux, Rook-Ceph, CNPG, Gitea, Tekton, Cert-Manager, VictoriaMetrics, ZITADEL",
   "files": [
