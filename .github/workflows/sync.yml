@@ -1,18 +1,13 @@
 name: Sync from Gitea
 
-# Syncs GitHub mirror with canonical Gitea source.
-# Triggered by: schedule (every 5min), manual, or after publish workflow
-
 on:
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
-  workflow_run:
-    workflows: [Publish to npm]
-    types: [completed]
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   sync:
@@ -33,6 +28,16 @@ jobs:
           if [ "$LOCAL" != "$REMOTE" ]; then
             echo "Gitea ahead. Syncing..."
             git push origin FETCH_HEAD:main
+            echo "synced=true" >> "$GITHUB_ENV"
           else
             echo "Already in sync."
+            echo "synced=false" >> "$GITHUB_ENV"
           fi
+
+      - name: Trigger publish
+        if: env.synced == 'true'
+        run: |
+          gh api -X POST repos/${{ github.repository }}/actions/workflows/publish.yml/dispatches \
+            -f ref=main
+        env:
+          GH_TOKEN: ${{ github.token }}
