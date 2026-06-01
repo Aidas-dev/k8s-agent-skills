@@ -1,0 +1,39 @@
+{
+  "name": "k8s-agent-skills",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Agent skills for Kubernetes cluster operations — Cilium, Talos, Flux, Rook-Ceph, CNPG, Gitea, Tekton, Cert-Manager, VictoriaMetrics, ZITADEL",
+  "files": [
+    "skills"
+  ],
+  "keywords": [
+    "ai-agent-skill",
+    "kubernetes",
+    "gitops",
+    "cilium",
+    "talos",
+    "flux",
+    "rook-ceph",
+    "postgresql",
+    "gitea",
+    "tekton",
+    "cert-manager",
+    "victoriametrics",
+    "zitadel",
+    "open-code",
+    "opencode",
+    "claude-code"
+  ],
+  "license": "MIT",
+  "homepage": "https://git.kubexa.tech/Aidas/k8s-agent-skills",
+  "repository": {
+    "type": "git",
+    "url": "git+https://git.kubexa.tech/Aidas/k8s-agent-skills.git"
+  },
+  "bugs": {
+    "url": "https://git.kubexa.tech/Aidas/k8s-agent-skills/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

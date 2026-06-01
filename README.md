@@ -4,7 +4,34 @@ Agent skills for Kubernetes cluster operations tooling. Each skill is a self-con
 
 ## Usage
 
-Copy individual skill directories to your agents skills path:
+### Via npm/bun (recommended)
+
+```bash
+# Install as dev dependency
+bun add -d k8s-agent-skills
+# or
+npm install --save-dev k8s-agent-skills
+
+# Symlink skills to agent config dir
+npx skills-npm
+# → symlinks skills/ into ~/.agents/skills/
+```
+
+### Via git clone
+
+```bash
+git clone https://git.kubexa.tech/Aidas/k8s-agent-skills.git
+ln -sf $(pwd)/k8s-agent-skills/skills/* ~/.agents/skills/
+```
+
+### Via Gitea npm registry
+
+```bash
+bun add -d @aidmantas/k8s-agent-skills@https://git.kubexa.tech/Aidas/k8s-agent-skills.git
+npx skills-npm
+```
+
+### Manual copy
 
 ```bash
 # OpenCode / Codex
@@ -12,12 +39,6 @@ cp -r skills/external-dns ~/.agents/skills/
 
 # Claude Code Desktop
 cp -r skills/flagger ~/.claude/skills/
-```
-
-Or symlink the whole set:
-
-```bash
-ln -sf $(pwd)/skills/* ~/.agents/skills/
 ```
 
 ## Skills
