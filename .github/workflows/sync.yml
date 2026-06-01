@@ -1,0 +1,25 @@
+name: Sync from Gitea
+
+on:
+  repository_dispatch:
+    types: [gitea-push]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch from Gitea and push to GitHub
+        env:
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+        run: |
+          git remote add gitea https://aidmantas:${GITEA_TOKEN}@git.kubexa.tech/Aidas/k8s-agent-skills.git
+          git fetch gitea main
+          git push origin gitea/main:main
