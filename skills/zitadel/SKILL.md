@@ -11,8 +11,9 @@ Skill router. Pick sub-skill based on task.
 
 | Task | Load skill | What it does |
 |---|---|---|
-| Create/manage OIDC/SAML/API apps, users, orgs, roles via API | `zitadel-api` (user-installed) | Auth, org/project/app CRUD, role grants, DB queries, Connect RPC + REST endpoints |
+| Create/manage OIDC/SAML/API apps, users, orgs, roles via API | `zitadel-api` | Auth, org/project/app CRUD, role grants, DB queries, Connect RPC + REST endpoints |
 | Install, configure, upgrade ZITADEL on K8s | `zitadel-helm` | HelmRelease, values, CNPG, Gateway API, caches, masterkey, SMTP, upgrades |
+| Manage ZITADEL resources as code with Terraform | `zitadel-terraform` | Provider config, orgs, projects, apps, users, IDPs, policies, system features, HCL examples |
 
 ## Decision Flow
 
@@ -20,3 +21,4 @@ Skill router. Pick sub-skill based on task.
 - Editing `release.yaml`, values, CNPG cluster, Gateway routes? → `zitadel-helm`
 - Need SAML or API app config? → `zitadel-api` (covers all 3 types with examples)
 - FirstInstance bootstrapping, masterkey rotation, SMTP setup? → `zitadel-helm`
+- Managing resources as code via Terraform? → `zitadel-terraform`
