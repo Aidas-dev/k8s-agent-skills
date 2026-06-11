@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# skills-link — Symlink k8s-agent-skills to agent skill directories
+# Usage:
+#   skills-link                    # link to ~/.agents/skills/ (OpenCode)
+#   skills-link --claude           # link to ~/.claude/skills/  (Claude Code)
+#   skills-link --codex            # link to ~/.codex/skills/  (Codex CLI)
+#   skills-link --cursor           # link to ~/.cursor/skills/ (Cursor)
+#   skills-link --all              # link to all known agent dirs
+#
+# Cleans up broken symlinks (removed skills) before linking.
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Package root is parent of bin/
+PKG_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+SKILLS_DIR="$PKG_DIR/skills"
+
+if [ ! -d "$SKILLS_DIR" ]; then
+  echo "ERROR: skills/ not found at $SKILLS_DIR" >&2
+  echo "Run this script from within the k8s-agent-skills package." >&2
+  exit 1
+fi
+
+declare -a TARGETS
+
+# Default target
+TARGETS+=("$HOME/.agents/skills")
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --claude)   TARGETS+=("$HOME/.claude/skills")    ;;
+    --codex)    TARGETS+=("$HOME/.codex/skills")      ;;
+    --cursor)   TARGETS+=("$HOME/.cursor/skills")     ;;
+    --agents)   TARGETS+=("$HOME/.agents/skills")     ;;
+    --all)
+      TARGETS+=("$HOME/.agents/skills")
+      TARGETS+=("$HOME/.claude/skills")
+      TARGETS+=("$HOME/.codex/skills")
+      TARGETS+=("$HOME/.cursor/skills")
+      ;;
+    --help|-h)
+      echo "Usage: skills-link [--claude] [--codex] [--cursor] [--agents] [--all]"
+      echo "Default: ~/.agents/skills/ (OpenCode)"
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      echo "Usage: skills-link [--claude] [--codex] [--cursor] [--agents] [--all]" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# Deduplicate targets
+declare -a UNIQUE
+for t in "${TARGETS[@]}"; do
+  seen=false
+  for u in "${UNIQUE[@]}"; do
+    [ "$u" = "$t" ] && seen=true && break
+  done
+  $seen || UNIQUE+=("$t")
+done
+
+for TARGET in "${UNIQUE[@]}"; do
+  mkdir -p "$TARGET"
+
+  # Cleanup broken symlinks (skills removed from package)
+  broken=0
+  while IFS= read -r -d '' link; do
+    if [ ! -e "$link" ]; then
+      rm -f "$link"
+      broken=$((broken + 1))
+    fi
+  done < <(find "$TARGET" -maxdepth 1 -type l -name '*' -print0 2>/dev/null || true)
+
+  # Symlink each skill
+  linked=0
+  skipped=0
+  migrated=0
+  for skill_dir in "$SKILLS_DIR"/*/; do
+    [ -d "$skill_dir" ] || continue
+    skill_name="$(basename "$skill_dir")"
+    link_path="$TARGET/$skill_name"
+
+    # Check if symlink already points to the right place
+    if [ -L "$link_path" ] && [ "$(readlink "$link_path")" = "$skill_dir" ]; then
+      skipped=$((skipped + 1))
+      continue
+    fi
+
+    # Handle existing entry at link_path
+    if [ -e "$link_path" ] || [ -L "$link_path" ]; then
+      if [ -L "$link_path" ]; then
+        rm -f "$link_path"
+      elif [ -d "$link_path" ] && [ -f "$link_path/SKILL.md" ]; then
+        # Old-style skill directory (copied, not symlinked) — replace with symlink
+        rm -rf "$link_path"
+        migrated=$((migrated + 1))
+      else
+        echo "  WARN: $link_path exists and is not a symlink — skipping" >&2
+        continue
+      fi
+    fi
+
+    ln -sf "$skill_dir" "$link_path"
+    linked=$((linked + 1))
+  done
+
+  echo "[$TARGET] linked $linked skill(s), $skipped up-to-date, $migrated migrated, $broken stale symlink(s) removed"
+done

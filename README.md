@@ -66,9 +66,14 @@ npm install --save-dev k8s-agent-skills
 # or
 bun add -d k8s-agent-skills
 
-# Symlink skills to agent config dir
-npx skills-npm
-# → symlinks skills/ into ~/.agents/skills/
+# Symlink all skills to ~/.agents/skills/ (OpenCode)
+npx skills-link
+
+# Or to other agent directories:
+npx skills-link --claude     # Claude Code  (~/.claude/skills/)
+npx skills-link --codex      # Codex CLI    (~/.codex/skills/)
+npx skills-link --cursor     # Cursor       (~/.cursor/skills/)
+npx skills-link --all        # all known agent dirs
 ```
 
 ### Via git clone
@@ -90,12 +95,18 @@ cp -r skills/external-dns ~/.claude/skills/
 
 ## npm Publishing
 
-The package auto-publishes to npm on push to `main` via GitHub Actions.
+Auto-publishes on `v*` tag push via GitHub Actions with OIDC Trusted Publisher — no tokens needed.
 
-**Setup required** (one-time):
-1. Create an npm automation token at [npmjs.com/settings/tokens](https://www.npmjs.com/settings/tokens)
-2. Add it as `NPM_TOKEN` secret in the GitHub repo settings
-3. Workflow at `.github/workflows/publish.yml` handles version bump and publish
+```bash
+# Bump version
+npm version patch  # or minor / major
+
+# Tag and push
+git push origin main --tags
+git push github main --tags
+```
+
+Or manually: `git tag vX.Y.Z && git push origin main --tags && git push github main --tags`.
 
 ## License
 

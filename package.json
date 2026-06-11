@@ -4,8 +4,12 @@
   "private": false,
   "description": "Agent skills for Kubernetes cluster operations — Cilium, Talos, Flux, Rook-Ceph, CNPG, Gitea, Tekton, Cert-Manager, VictoriaMetrics, ZITADEL, Harbor, Higress, KServe, Kubeflow, MariaDB, Vector, ExternalDNS, Dragonfly, Flagger, Sealed Secrets, Stakater Reloader, NVIDIA GPU, Atlas",
   "files": [
-    "skills"
+    "skills",
+    "bin"
   ],
+  "bin": {
+    "skills-link": "./bin/skills-link"
+  },
   "keywords": [
     "ai-agent-skill",
     "kubernetes",
