@@ -1,1 +1,40 @@
+# Node
 node_modules/
+npm-debug.log*
+*.tgz
+*.pkg
+.shrinkwrap.json
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Agent tooling
+.claude/skills/
+.codex/skills/
+.cursor/skills/
+.agents/skills/
+
+# Build
+dist/
+build/
+out/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Python (for bin scripts)
+__pycache__/
+*.pyc
+.pytest_cache/

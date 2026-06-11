@@ -1,8 +1,14 @@
 # k8s-agent-skills
 
+[![npm version](https://img.shields.io/npm/v/k8s-agent-skills?logo=npm)](https://www.npmjs.com/package/k8s-agent-skills)
+[![license](https://img.shields.io/github/license/Aidas-dev/k8s-agent-skills)](LICENSE)
+[![Publish](https://github.com/Aidas-dev/k8s-agent-skills/actions/workflows/publish.yml/badge.svg)](https://github.com/Aidas-dev/k8s-agent-skills/actions/workflows/publish.yml)
+[![GitHub stars](https://img.shields.io/github/stars/Aidas-dev/k8s-agent-skills?style=flat)](https://github.com/Aidas-dev/k8s-agent-skills)
+
 Agent skills for Kubernetes cluster operations tooling. Each skill is a self-contained `SKILL.md` designed for agentic AI tools (Claude Code, OpenCode, Codex) that load skills for task-specific expertise.
 
-**Mirror:** [github.com/Aidas-dev/k8s-agent-skills](https://github.com/Aidas-dev/k8s-agent-skills)
+**npm:** [`k8s-agent-skills`](https://www.npmjs.com/package/k8s-agent-skills)
+**GitHub:** [`Aidas-dev/k8s-agent-skills`](https://github.com/Aidas-dev/k8s-agent-skills)
 
 ## Skills
 
@@ -110,4 +116,4 @@ Or manually: `git tag vX.Y.Z && git push origin main --tags && git push github m
 
 ## License
 
-MIT — free to use, modify, and distribute.
+[MIT](LICENSE) — free to use, modify, and distribute.
