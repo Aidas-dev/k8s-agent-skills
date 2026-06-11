@@ -68,19 +68,6 @@ jobs:
         id: version
         run: echo "current=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
 
-      - name: Check if version already published
-        id: check
-        continue-on-error: true
-        run: |
-          published=$(npm view ${{ github.event.repository.name }}@${{ steps.version.outputs.current }} version 2>/dev/null || echo "")
-          if [ "$published" = "${{ steps.version.outputs.current }}" ]; then
-            echo "Version ${{ steps.version.outputs.current }} already published"
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Version ${{ steps.version.outputs.current }} not published yet"
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Auto-bump version (workflow_dispatch)
         if: github.event_name == 'workflow_dispatch'
         run: |
@@ -90,11 +77,10 @@ jobs:
           echo "new_version=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
         id: bump
 
-      # OIDC auth is automatic — npm CLI detects ACTIONS_ID_TOKEN_REQUEST_URL
-      # and exchanges the OIDC token for an npm auth token at publish time.
-      # No NODE_AUTH_TOKEN / NPM_TOKEN needed.
+      # Publish only on tag pushes and workflow_dispatch — NOT on main branch pushes.
+      # This avoids a race where main push publishes before the tag workflow runs.
       - name: Publish to npm with trusted publishing + provenance
-        if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch'
+        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
         run: npm publish --provenance --access public
 
       - name: Push version bump commit back
