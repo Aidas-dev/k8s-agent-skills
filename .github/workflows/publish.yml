@@ -44,7 +44,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 24   # 24.x ships npm 11.5.1+ (required for OIDC)
+          node-version: 26   # 26.x ships npm 11.5.1+ (required for OIDC)
           registry-url: https://registry.npmjs.org
 
       - name: Upgrade npm (OIDC needs 11.5.1+)
