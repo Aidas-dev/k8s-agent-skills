@@ -50,6 +50,20 @@ jobs:
       - name: Upgrade npm (OIDC needs 11.5.1+)
         run: npm install -g npm@latest
 
+      - name: Extract tag version
+        id: tag
+        if: github.ref_type == 'tag'
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set version from tag
+        if: github.ref_type == 'tag'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          npm version --allow-same-version "${{ steps.tag.outputs.version }}"
+
       - name: Read current version
         id: version
         run: echo "current=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
