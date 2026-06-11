@@ -2,6 +2,8 @@ name: Publish to npm
 
 on:
   push:
+    tags:
+      - 'v*'
     branches: [main]
     paths:
       - 'skills/**'
@@ -18,9 +20,19 @@ on:
           - minor
           - major
 
+# Trusted Publishing via OIDC — no NPM_TOKEN secret needed.
+# 1. Package must exist on npmjs.com first
+# 2. Configure at npmjs.com → package settings → Trusted Publisher:
+#    - Provider: GitHub Actions
+#    - Repo: Aidas-dev/k8s-agent-skills
+#    - Workflow filename: publish.yml
+#    - Environment: (leave blank)
+#    - Allowed actions: npm publish
+# 3. That's it — OIDC handles auth automatically.
+
 permissions:
   contents: write
-  id-token: write
+  id-token: write          # Required for OIDC trusted publishing + provenance
 
 jobs:
   publish:
@@ -32,8 +44,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24   # 24.x ships npm 11.5.1+ (required for OIDC)
           registry-url: https://registry.npmjs.org
+
+      - name: Upgrade npm (OIDC needs 11.5.1+)
+        run: npm install -g npm@latest
 
       - name: Read current version
         id: version
@@ -61,10 +76,11 @@ jobs:
           echo "new_version=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
         id: bump
 
-      - name: Publish to npm
+      # OIDC auth is automatic — npm CLI detects ACTIONS_ID_TOKEN_REQUEST_URL
+      # and exchanges the OIDC token for an npm auth token at publish time.
+      # No NODE_AUTH_TOKEN / NPM_TOKEN needed.
+      - name: Publish to npm with trusted publishing + provenance
         if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
 
       - name: Push version bump commit back
