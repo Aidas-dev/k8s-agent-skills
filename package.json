@@ -1,8 +1,8 @@
 {
   "name": "k8s-agent-skills",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "private": false,
-  "description": "Agent skills for Kubernetes cluster operations — Cilium, Talos, Flux, Rook-Ceph, CNPG, Gitea, Tekton, Cert-Manager, VictoriaMetrics, ZITADEL",
+  "description": "Agent skills for Kubernetes cluster operations — Cilium, Talos, Flux, Rook-Ceph, CNPG, Gitea, Tekton, Cert-Manager, VictoriaMetrics, ZITADEL, Harbor, Higress, KServe, Kubeflow, MariaDB, Vector, ExternalDNS, Dragonfly, Flagger, Sealed Secrets, Stakater Reloader, NVIDIA GPU, Atlas",
   "files": [
     "skills"
   ],
@@ -15,23 +15,46 @@
     "flux",
     "rook-ceph",
     "postgresql",
+    "cnpg",
     "gitea",
     "tekton",
     "cert-manager",
     "victoriametrics",
     "zitadel",
+    "harbor",
+    "higress",
+    "kserve",
+    "kubeflow",
+    "mariadb",
+    "vector",
+    "dragonfly",
+    "flagger",
+    "external-dns",
+    "sealed-secrets",
+    "stakater-reloader",
+    "nvidia-gpu",
+    "atlas",
     "open-code",
     "opencode",
     "claude-code"
   ],
   "license": "MIT",
-  "homepage": "https://git.kubexa.tech/Aidas/k8s-agent-skills",
+  "author": {
+    "name": "Aidas",
+    "url": "https://github.com/Aidas-dev"
+  },
+  "homepage": "https://github.com/Aidas-dev/k8s-agent-skills",
   "repository": {
     "type": "git",
-    "url": "git+https://git.kubexa.tech/Aidas/k8s-agent-skills.git"
+    "url": "git+https://github.com/Aidas-dev/k8s-agent-skills.git"
   },
   "bugs": {
-    "url": "https://git.kubexa.tech/Aidas/k8s-agent-skills/issues"
+    "url": "https://github.com/Aidas-dev/k8s-agent-skills/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org",
+    "provenance": true
   },
   "engines": {
     "node": ">=18"

@@ -63,6 +63,8 @@ jobs:
 
       - name: Publish to npm
         if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
 
       - name: Push version bump commit back
