@@ -42,6 +42,57 @@ tasks:
 
 Resolvers: `git`, `cluster`, `hub`. See TTL section below for cache config.
 
+### Git Authentication (Private Repos)
+
+Authenticate against private Git repositories via the ServiceAccount's `secrets` — Tekton's `creds-init` init container reads `kubernetes.io/basic-auth` secrets automatically and configures git before any task step runs. No workspace plumbing needed.
+
+```yaml
+# 1. Create the secret with annotation targeting the host
+apiVersion: v1
+kind: Secret
+metadata:
+  name: git-creds
+  annotations:
+    tekton.dev/git-0: https://git.example.com  # host-wide, any repo
+type: kubernetes.io/basic-auth
+stringData:
+  username: <user-or-bot-name>
+  password: <pat-or-token>
+
+# 2. Attach to the PipelineRun's ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default  # or a dedicated pipeline SA
+secrets:
+  - name: git-creds
+```
+
+For multiple hosts, increment the annotation index:
+```yaml
+metadata:
+  annotations:
+    tekton.dev/git-0: https://github.com
+    tekton.dev/git-1: https://gitlab.com
+```
+
+Per-repo targeting (full path):
+```yaml
+metadata:
+  annotations:
+    tekton.dev/git-0: https://github.com/org/repo
+```
+
+**git-clone task with basic-auth workspace** (alternative approach):
+```yaml
+workspaces:
+  - name: basic-auth
+    secret:
+      secretName: git-basic-auth-creds  # Opaque secret with .gitconfig + .git-credentials keys
+```
+
+The SA-based approach is preferred — it works for ALL git operations in the PipelineRun (clone, tag, push), not just the git-clone task. It also works automatically with the hub resolver's git resolution.
+
 ### Node Targeting via podTemplate
 
 Uniform placement across pipeline:
