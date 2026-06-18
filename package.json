@@ -1,8 +1,8 @@
 {
   "name": "k8s-agent-skills",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": false,
-  "description": "Agent skills for Kubernetes cluster operations — Cilium, Talos, Flux, Rook-Ceph, CNPG, Gitea, Tekton, Cert-Manager, VictoriaMetrics, ZITADEL, Harbor, Higress, KServe, Kubeflow, MariaDB, Vector, ExternalDNS, Dragonfly, Flagger, Sealed Secrets, Stakater Reloader, NVIDIA GPU, Atlas",
+  "description": "Agent skills for Kubernetes cluster operations — Cilium, Talos, Flux, Rook-Ceph, CNPG, Gitea, Tekton, Cert-Manager, VictoriaMetrics, ZITADEL, Harbor, Higress, KServe, Kubeflow, MariaDB, Vector, ExternalDNS, External Secrets, Vault, Dragonfly, Flagger, Sealed Secrets, Stakater Reloader, NVIDIA GPU, Atlas",
   "files": [
     "skills",
     "bin"
@@ -34,7 +34,10 @@
     "dragonfly",
     "flagger",
     "external-dns",
+    "external-secrets",
+    "hashicorp-vault",
     "sealed-secrets",
+    "vault",
     "stakater-reloader",
     "nvidia-gpu",
     "atlas",

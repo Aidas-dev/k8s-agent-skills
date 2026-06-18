@@ -21,6 +21,7 @@ Agent skills for Kubernetes cluster operations tooling. Each skill is a self-con
 | [cnpg](skills/cnpg/SKILL.md) | CloudNativePG — PostgreSQL clusters, backups, poolers | Cluster, Backup, ScheduledBackup, Pooler |
 | [dragonfly](skills/dragonfly/SKILL.md) | DragonflyDB — Redis-compatible operator, replication, TLS | Dragonfly |
 | [external-dns](skills/external-dns/SKILL.md) | DNS sync — Cloudflare, Route53, Gateway API, sources, registry | None |
+| [external-secrets](skills/external-secrets/SKILL.md) | External Secrets Operator — sync K8s Secrets from Vault, AWS, GCP, Azure | SecretStore, ClusterSecretStore, ExternalSecret, PushSecret |
 | [flagger](skills/flagger/SKILL.md) | Progressive delivery, canary, A/B, blue/green | Canary, MetricTemplate, AlertProvider |
 | [flux](skills/flux/SKILL.md) | Flux CD router — debugging, CRDs, repo audit | Router → sub-skills |
 | [gitea](skills/gitea/SKILL.md) | Gitea router — API, runner, registry, webhooks, tea CLI | Router → sub-skills |
@@ -53,6 +54,10 @@ Agent skills for Kubernetes cluster operations tooling. Each skill is a self-con
 | [stakater-reloader](skills/stakater-reloader/SKILL.md) | ConfigMap/Secret reload, annotations, Helm values | None (annotation-based) |
 | [talos](skills/talos/SKILL.md) | Talos Linux — cluster deploy, machine config, upgrades, talosctl | None |
 | [tekton](skills/tekton/SKILL.md) | Tekton pipelines — resolver refs, matrix, CEL, TTL | Task, Pipeline, etc. |
+| [vault](skills/vault/SKILL.md) | Vault router — Helm, API, Terraform | Router → sub-skills |
+| [vault-api](skills/vault-api/SKILL.md) | Vault REST API — health, init, unseal, auth, KV, policies | None |
+| [vault-helm](skills/vault-helm/SKILL.md) | Vault Helm chart — HA+Raft, injector, storage, TLS, telemetry | None |
+| [vault-terraform](skills/vault-terraform/SKILL.md) | Vault Terraform provider — 188+ resources, auth backends, KV, policies, identity | None |
 | [vector](skills/vector/SKILL.md) | Vector router — Helm, operator CRDs | Router → sub-skills |
 | [vector-helm](skills/vector-helm/SKILL.md) | Vector Helm chart — 3 roles (Agent/Aggregator/Stateless), customConfig | None |
 | [vector-operator](skills/vector-operator/SKILL.md) | Vector operator — 5 CRDs, auto-routing by source type | Vector, VectorPipeline, ClusterVectorPipeline, VectorAggregator, ClusterVectorAggregator |
