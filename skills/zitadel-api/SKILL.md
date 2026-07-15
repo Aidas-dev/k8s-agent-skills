@@ -1,17 +1,18 @@
 ---
-name: zitadel
+name: zitadel-api
 description: >
   ZITADEL identity management platform (v4 GA, v2 API). Covers resource-based API for
   managing organizations, projects, applications (OIDC/SAML/API), roles, users, and
   OIDC settings via Connect RPC (HTTP/1.1 JSON) and REST endpoints. PAT or
   JWT assertion auth.
 triggers:
-  - zitadel
   - zitadel api
   - oidc app
   - zitadel app creation
   - zitadel user
   - auth api
+  - zitadel oidc
+  - zitadel saml
 ---
 
 # ZITADEL API v2 (v4 GA)

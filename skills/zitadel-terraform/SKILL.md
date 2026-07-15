@@ -6,7 +6,7 @@ description: Manage ZITADEL identity platform resources as code using the Terraf
 # ZITADEL Terraform Provider
 
 **Provider:** `zitadel/zitadel`
-**Latest:** v3.0.0
+**Latest:** v3.3.0
 **Source:** `github.com/zitadel/terraform-provider-zitadel`
 **Registry:** [terraform.io/providers/zitadel/zitadel](https://registry.terraform.io/providers/zitadel/zitadel/latest)
 
