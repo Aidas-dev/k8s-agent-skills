@@ -17,7 +17,7 @@ docker login git.example.com
 
 ## Image Naming
 
-```
+```text
 {registry}/{owner}/{image}:{tag}
 ```
 
