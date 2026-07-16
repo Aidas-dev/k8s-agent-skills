@@ -9,7 +9,7 @@ description: Use when working with HashiCorp Vault REST API — health checks, i
 
 Vault exposes a RESTful JSON API on port 8200. All requests include `X-Vault-Token` header for authenticated endpoints. Unauthenticated endpoints (health, init) need no token.
 
-**Base URL:** `http://vault.vault:8200` (in-cluster) or `https://vault.kubexa.tech` (external via Gateway).
+**Base URL:** `http://vault.vault:8200` (in-cluster) or `https://vault.example.com` (external via Gateway).
 
 ## API Endpoints
 

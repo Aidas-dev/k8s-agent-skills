@@ -9,7 +9,7 @@ description: Use when managing Nextcloud users, groups, and apps via the Provisi
 
 The Provisioning API enables external systems to create, edit, delete and query user attributes, manage groups, set quotas, query storage, and manage apps. Enabled by default. Uses the OCS API endpoint format.
 
-**Base URL:** `https://nextcloud.kubexa.tech/ocs/v1.php/cloud`
+**Base URL:** `https://nextcloud.example.com/ocs/v1.php/cloud`
 
 **Auth:** Basic HTTP Auth (admin username:password) + OCS-APIRequest header
 
@@ -25,7 +25,7 @@ The Provisioning API enables external systems to create, edit, delete and query 
 ### Add a New User
 
 ```bash
-curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users" \
+curl -X POST "https://nextcloud.example.com/ocs/v1.php/cloud/users" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -43,7 +43,7 @@ Status codes: 100=ok, 101=invalid, 102=already exists, 104=group missing
 ### List Users
 
 ```bash
-curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users?search=filter&limit=100&offset=0" \
+curl -X GET "https://nextcloud.example.com/ocs/v1.php/cloud/users?search=filter&limit=100&offset=0" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" | python3 -c "import sys, xml.etree.ElementTree as ET; print('\n'.join(e.text for e in ET.parse(sys.stdin).findall('.//users/element')))"
 ```
@@ -51,7 +51,7 @@ curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users?search=filter&
 ### Get Single User
 
 ```bash
-curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser" \
+curl -X GET "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" | python3 -c "
 import sys, xml.etree.ElementTree as ET
@@ -69,7 +69,7 @@ Returns: enabled, id, quota, email, displayname, phone, address, website, twitte
 ### Edit User
 
 ```bash
-curl -X PUT "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser" \
+curl -X PUT "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -82,7 +82,7 @@ Editable fields: `email`, `quota`, `displayname`, `phone`, `address`, `website`,
 ### Disable User
 
 ```bash
-curl -X PUT "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/disable" \
+curl -X PUT "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser/disable" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -90,7 +90,7 @@ curl -X PUT "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/disabl
 ### Enable User
 
 ```bash
-curl -X PUT "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/enable" \
+curl -X PUT "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser/enable" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -98,7 +98,7 @@ curl -X PUT "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/enable
 ### Delete User
 
 ```bash
-curl -X DELETE "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser" \
+curl -X DELETE "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -106,7 +106,7 @@ curl -X DELETE "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser" \
 ### Get User Groups
 
 ```bash
-curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/groups" \
+curl -X GET "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser/groups" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -114,7 +114,7 @@ curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/groups
 ### Add User to Group
 
 ```bash
-curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/groups" \
+curl -X POST "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser/groups" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -124,7 +124,7 @@ curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/group
 ### Remove User from Group
 
 ```bash
-curl -X DELETE "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/groups" \
+curl -X DELETE "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser/groups" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -134,7 +134,7 @@ curl -X DELETE "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/gro
 ### Promote to Subadmin
 
 ```bash
-curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/subadmins" \
+curl -X POST "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser/subadmins" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -144,7 +144,7 @@ curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/subad
 ### Demote from Subadmin
 
 ```bash
-curl -X DELETE "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/subadmins" \
+curl -X DELETE "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser/subadmins" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -154,7 +154,7 @@ curl -X DELETE "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/sub
 ### Resend Welcome Email
 
 ```bash
-curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/welcome" \
+curl -X POST "https://nextcloud.example.com/ocs/v1.php/cloud/users/newuser/welcome" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -164,7 +164,7 @@ curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/users/newuser/welco
 ### List Groups
 
 ```bash
-curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/groups?search=adm&limit=50&offset=0" \
+curl -X GET "https://nextcloud.example.com/ocs/v1.php/cloud/groups?search=adm&limit=50&offset=0" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -172,7 +172,7 @@ curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/groups?search=adm&li
 ### Create Group
 
 ```bash
-curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/groups" \
+curl -X POST "https://nextcloud.example.com/ocs/v1.php/cloud/groups" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -184,7 +184,7 @@ Status codes: 100=ok, 101=invalid, 102=already exists
 ### Get Group Members
 
 ```bash
-curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/groups/admin" \
+curl -X GET "https://nextcloud.example.com/ocs/v1.php/cloud/groups/admin" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -194,7 +194,7 @@ Returns list of users in the group.
 ### Get Group Subadmins
 
 ```bash
-curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/groups/mygroup/subadmins" \
+curl -X GET "https://nextcloud.example.com/ocs/v1.php/cloud/groups/mygroup/subadmins" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -202,7 +202,7 @@ curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/groups/mygroup/subad
 ### Edit Group Display Name
 
 ```bash
-curl -X PUT "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/groups/mygroup" \
+curl -X PUT "https://nextcloud.example.com/ocs/v1.php/cloud/groups/mygroup" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -213,7 +213,7 @@ curl -X PUT "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/groups/mygroup" \
 ### Delete Group
 
 ```bash
-curl -X DELETE "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/groups/mygroup" \
+curl -X DELETE "https://nextcloud.example.com/ocs/v1.php/cloud/groups/mygroup" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -225,7 +225,7 @@ Does not delete users in the group. Cannot delete the `admin` group.
 ### List Apps
 
 ```bash
-curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/apps?filter=enabled" \
+curl -X GET "https://nextcloud.example.com/ocs/v1.php/cloud/apps?filter=enabled" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -235,7 +235,7 @@ Filter: `enabled`, `disabled`, or omit for all.
 ### Get App Info
 
 ```bash
-curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/apps/files" \
+curl -X GET "https://nextcloud.example.com/ocs/v1.php/cloud/apps/files" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -243,7 +243,7 @@ curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/apps/files" \
 ### Enable App
 
 ```bash
-curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/apps/files_texteditor" \
+curl -X POST "https://nextcloud.example.com/ocs/v1.php/cloud/apps/files_texteditor" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -251,7 +251,7 @@ curl -X POST "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/apps/files_textedit
 ### Disable App
 
 ```bash
-curl -X DELETE "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/apps/files_texteditor" \
+curl -X DELETE "https://nextcloud.example.com/ocs/v1.php/cloud/apps/files_texteditor" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```
@@ -261,7 +261,7 @@ curl -X DELETE "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/apps/files_texted
 Available via API:
 
 ```bash
-curl -X GET "https://nextcloud.kubexa.tech/ocs/v1.php/cloud/user/fields" \
+curl -X GET "https://nextcloud.example.com/ocs/v1.php/cloud/user/fields" \
   -H "Authorization: Basic $(echo -n 'admin:password' | base64)" \
   -H "OCS-APIRequest: true"
 ```

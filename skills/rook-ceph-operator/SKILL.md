@@ -50,19 +50,19 @@ spec:
     useAllNodes: false
     useAllDevices: false
     nodes:
-      - name: worker-svt
+      - name: worker-01
         deviceFilter: ^vdb$
-      - name: worker-infra
-        deviceFilter: ^vdb$
-        config:
-          deviceClass: nvme
-          osdsPerDevice: "1"
-      - name: worker-proxmox
+      - name: worker-02
         deviceFilter: ^vdb$
         config:
           deviceClass: nvme
           osdsPerDevice: "1"
-      - name: worker-proxmox-gpu
+      - name: worker-03
+        deviceFilter: ^vdb$
+        config:
+          deviceClass: nvme
+          osdsPerDevice: "1"
+      - name: worker-04
         deviceFilter: ^nvme
         config:
           deviceClass: nvme

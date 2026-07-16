@@ -95,18 +95,18 @@ spec:
   - name: http
     protocol: HTTP
     port: 80
-    hostname: "*.kubexa.tech"
+    hostname: "*.example.com"
     allowedRoutes:
       namespaces:
         from: All
   - name: https
     protocol: HTTPS
     port: 443
-    hostname: "*.kubexa.tech"
+    hostname: "*.example.com"
     tls:
       mode: Terminate
       certificateRefs:
-      - name: kubexa-tech-tls
+      - name: example-tls
         kind: Secret
   allowedRoutes:
     namespaces:
@@ -125,7 +125,7 @@ spec:
   - name: cilium-gateway
     sectionName: http
   hostnames:
-  - "*.kubexa.tech"
+  - "*.example.com"
   rules:
   - filters:
     - type: RequestRedirect
@@ -147,7 +147,7 @@ spec:
     namespace: cilium-gateway
     sectionName: https
   hostnames:
-  - app.kubexa.tech
+  - app.example.com
   rules:
   - matches:
     - path:
@@ -173,7 +173,7 @@ spec:
   to:
   - group: ""
     kind: Secret
-    name: kubexa-tech-tls
+    name: example-tls
 ```
 Needed when HTTPRoute is in a different namespace than the Gateway or the Secret.
 
@@ -190,7 +190,7 @@ spec:
     namespace: cilium-gateway
     sectionName: https
   hostnames:
-  - hubble.kubexa.tech
+  - hubble.example.com
   rules:
   - backendRefs:
     - name: oauth2-proxy-hubble

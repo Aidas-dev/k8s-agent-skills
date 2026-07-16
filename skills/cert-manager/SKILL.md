@@ -64,16 +64,16 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: kubexa-tech-gateway
+  name: example-gateway
   namespace: cilium-gateway
 spec:
-  secretName: kubexa-tech-tls
+  secretName: example-tls
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
-    - "*.kubexa.tech"
-    - "kubexa.tech"
+    - "*.example.com"
+    - "example.com"
   duration: 168h         # 7 days
   renewBefore: 144h      # Renew 6 days before expiry
   privateKey:

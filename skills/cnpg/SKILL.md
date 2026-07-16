@@ -49,7 +49,7 @@ spec:
 
   affinity:
     nodeSelector:
-      kubernetes.io/hostname: worker-proxmox
+      kubernetes.io/hostname: worker-01
     podAntiAffinity:
       type: preferred             # required or preferred
       topologyKey: kubernetes.io/hostname

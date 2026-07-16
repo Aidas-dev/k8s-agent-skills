@@ -34,19 +34,19 @@ terraform {
 
 # Personal Access Token
 provider "zitadel" {
-  domain       = "auth.kubexa.tech"
+  domain       = "auth.example.com"
   access_token = var.zitadel_pat
 }
 
 # JWT Profile (service account)
 provider "zitadel" {
-  domain           = "auth.kubexa.tech"
+  domain           = "auth.example.com"
   jwt_profile_file = "zitadel-service-account.json"
 }
 
 # System API (instance-level management)
 provider "zitadel" {
-  domain = "auth.kubexa.tech"
+  domain = "auth.example.com"
   system_api {
     user   = var.system_user_id
     key    = var.system_private_key_pem
@@ -116,7 +116,7 @@ resource "zitadel_org_member" "dev" {
 # Org domain (4.x+)
 resource "zitadel_organization_domain" "main" {
   org_id = zitadel_organization.myapp.id
-  domain = "myapp.kubexa.tech"
+  domain = "myapp.example.com"
 }
 ```
 
@@ -441,8 +441,8 @@ resource "zitadel_default_label_policy" "cfg" {
   background_color_dark = "#1A202C"
   font_color_dark      = "#EDF2F7"
   disable_watermark    = false
-  logo_url             = "https://static.kubexa.tech/logo.svg"
-  logo_url_dark        = "https://static.kubexa.tech/logo-dark.svg"
+  logo_url             = "https://static.example.com/logo.svg"
+  logo_url_dark        = "https://static.example.com/logo-dark.svg"
 }
 ```
 
@@ -486,7 +486,7 @@ resource "zitadel_system_features" "cfg" {
   ]
   login_v2 = {
     required = true
-    base_uri = "https://login.kubexa.tech"
+    base_uri = "https://login.example.com"
   }
 }
 ```
@@ -543,11 +543,11 @@ Same list without `default_` prefix: `zitadel_init_message_text`, `zitadel_verif
 ```hcl
 # SMTP Email Provider
 resource "zitadel_email_provider_smtp" "main" {
-  from_address   = "noreply@kubexa.tech"
+  from_address   = "noreply@example.com"
   from_name      = "ZITADEL Auth"
-  smtp_host      = "smtp.kubexa.tech"
+  smtp_host      = "smtp.example.com"
   smtp_port      = 587
-  smtp_user      = "zitadel@smtp.kubexa.tech"
+  smtp_user      = "zitadel@smtp.example.com"
   smtp_password  = var.smtp_password
   tls_type       = "TLS"
   start_tls      = true
@@ -648,7 +648,7 @@ terraform {
 }
 
 provider "zitadel" {
-  domain           = "auth.kubexa.tech"
+  domain           = "auth.example.com"
   jwt_profile_file = "zitadel-admin.json"
 }
 
@@ -679,7 +679,7 @@ resource "zitadel_application_oidc" "console" {
   project_id   = zitadel_project.idp.id
   name         = "Console UI"
 
-  redirect_uris       = ["https://console.kubexa.tech/callback"]
+  redirect_uris       = ["https://console.example.com/callback"]
   response_types      = ["OIDC_RESPONSE_TYPE_CODE"]
   grant_types         = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
   app_type            = "OIDC_APP_TYPE_WEB"

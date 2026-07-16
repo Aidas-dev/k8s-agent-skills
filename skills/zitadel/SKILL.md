@@ -1,6 +1,6 @@
 ---
 name: zitadel
-description: Use when working with ZITADEL identity platform — API operations (orgs, apps, users, roles) or Helm deployment (install, configure, upgrade on K8s). Triggers: auth.kubexa.tech, zitadel OIDC app creation, SAML/API app, zitadel deployment.
+description: Use when working with ZITADEL identity platform — API operations (orgs, apps, users, roles) or Helm deployment (install, configure, upgrade on K8s). Triggers: auth.example.com, zitadel OIDC app creation, SAML/API app, zitadel deployment.
 ---
 
 # ZITADEL
@@ -17,7 +17,7 @@ Skill router. Pick sub-skill based on task.
 
 ## Decision Flow
 
-- Using curl/API calls to `auth.kubexa.tech`? → `zitadel-api`
+- Using curl/API calls to `auth.example.com`? → `zitadel-api`
 - Editing `release.yaml`, values, CNPG cluster, Gateway routes? → `zitadel-helm`
 - Need SAML or API app config? → `zitadel-api` (covers all 3 types with examples)
 - FirstInstance bootstrapping, masterkey rotation, SMTP setup? → `zitadel-helm`

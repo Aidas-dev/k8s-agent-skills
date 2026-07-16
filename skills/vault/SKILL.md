@@ -1,6 +1,6 @@
 ---
 name: vault
-description: Use when working with HashiCorp Vault — deploying to Kubernetes (Helm), REST API operations, or managing Vault resources as Terraform code. Triggers: vault.kubexa.tech, Vault HA setup, Vault unseal, Vault Terraform resources.
+description: Use when working with HashiCorp Vault — deploying to Kubernetes (Helm), REST API operations, or managing Vault resources as Terraform code. Triggers: vault.example.com, Vault HA setup, Vault unseal, Vault Terraform resources.
 ---
 
 # Vault
@@ -18,6 +18,6 @@ Skill router. Pick sub-skill based on task.
 ## Decision Flow
 
 - Editing `release.yaml`, deploying Vault cluster, configuring HA+Raft? → `vault-helm`
-- Running curl against `vault.kubexa.tech`, init/unseal, login, read/write secrets? → `vault-api`
+- Running curl against `vault.example.com`, init/unseal, login, read/write secrets? → `vault-api`
 - Managing resources as code via Terraform (`vault_auth_backend`, `vault_kv_secret_v2`)? → `vault-terraform`
 - Need Vault OSS feature check (no Namespaces, DR, Sentinel)? → `vault-api` (limitations section)

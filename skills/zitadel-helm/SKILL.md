@@ -189,7 +189,7 @@ zitadel:
           Password: "Admin123!"
           FirstName: Admin
           LastName: User
-          Email: admin@kubexa.tech
+          Email: admin@example.com
           PasswordChangeRequired: false
         Machine:
           Machine:

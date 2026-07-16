@@ -72,7 +72,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                  - worker-proxmox
+                  - worker-01
 
   authentication:
     passwordFromSecret:

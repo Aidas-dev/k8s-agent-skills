@@ -180,6 +180,6 @@ spec:
 - **`upsert-only` doesn't clean up stale records.** When an Ingress/HTTPRoute is deleted, its DNS record persists. Use `sync` policy or manual cleanup.
 - **Cloudflare API token needs specific permissions.** Requires `Zone:DNS:Edit` for the target zone. A token with only `Zone:Read` will fail silently.
 - **`--cloudflare-proxied` is a global flag.** To proxy only specific records, omit the global flag and use the `external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"` annotation per resource.
-- **Domain filter is a suffix match.** `kubexa.tech` matches `app.kubexa.tech` but NOT `kubexa.tech.app.com`. Add trailing dot if needed.
+- **Domain filter is a suffix match.** `example.com` matches `app.example.com` but NOT `example.com.app.com`. Add trailing dot if needed.
 - **NodePort services not supported** with `source=service`. Only LoadBalancer services are detected.
 - **Multiple TXT owner IDs on same zone.** If two ExternalDNS instances manage the same zone with different `txtOwnerId`, they can coexist. Records with unknown owner ID are left untouched by `upsert-only`.

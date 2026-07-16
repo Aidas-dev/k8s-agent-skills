@@ -111,7 +111,7 @@ spec:
     dedup.minScrapeInterval: 30s
     memory.allowedPercent: "60"
   nodeSelector:
-    kubernetes.io/hostname: worker-proxmox
+    kubernetes.io/hostname: worker-01
 ```
 
 ### VMServiceScrape — Auto-Discover Service

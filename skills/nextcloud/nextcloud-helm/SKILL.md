@@ -66,7 +66,7 @@ httpRoute:
   apiVersion: gateway.networking.k8s.io/v1
   kind: HTTPRoute
   hostnames:
-    - "nextcloud.kubexa.tech"
+    - "nextcloud.example.com"
   parentRefs:
     - name: cilium-gateway
       namespace: cilium-gateway
@@ -158,13 +158,13 @@ nextcloud:
   mail:
     enabled: true
     fromAddress: noreply
-    domain: kubexa.tech
+    domain: example.com
     smtp:
       host: smtp-relay.brevo.com
       secure: ssl
       port: 465
       authtype: LOGIN
-      name: noreply@kubexa.tech
+      name: noreply@example.com
       password: ""  # via valuesFrom secret
 ```
 
@@ -399,7 +399,7 @@ nextcloud:
         php occ user_oidc:provider zitadel \
           --clientid="${OIDC_CLIENT_ID}" \
           --clientsecret="${OIDC_CLIENT_SECRET}" \
-          --discoveryuri="https://auth.kubexa.tech/.well-known/openid-configuration"
+          --discoveryuri="https://auth.example.com/.well-known/openid-configuration"
   extraEnv:
     - name: OIDC_CLIENT_ID
       valueFrom:
@@ -419,10 +419,10 @@ Create OIDC app in ZITADEL (Authorization Code + client_secret_basic):
 
 ```bash
 # Redirect URI
-https://nextcloud.kubexa.tech/index.php/apps/user_oidc/code?flow=1
+https://nextcloud.example.com/index.php/apps/user_oidc/code?flow=1
 
 # Post-logout redirect
-https://nextcloud.kubexa.tech/
+https://nextcloud.example.com/
 ```
 
 ### Bearer token validation

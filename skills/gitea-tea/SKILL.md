@@ -30,7 +30,7 @@ Use this skill when tasks target Gitea and the `tea` CLI, especially if the user
 ### Create login profile (token)
 
 ```bash
-tea logins add --name <profile> --url https://git.kubexa.tech --token <token>
+tea logins add --name <profile> --url https://git.example.com --token <token>
 ```
 
 ### Verify logins / switch default
@@ -100,7 +100,7 @@ tea releases assets --help
 ```bash
 tea clone <repo-slug> [target-dir]
 tea clone gitea/tea                                 # Short form
-tea clone https://git.kubexa.tech/owner/repo.git    # Full URL
+tea clone https://git.example.com/owner/repo.git    # Full URL
 ```
 
 Supports various slug formats: `owner/repo`, `host/owner/repo`, full URLs. Overrides login when host specified.
@@ -143,7 +143,7 @@ spec:
           image: gitea/runner:latest
           env:
             - name: GITEA_INSTANCE_URL
-              value: https://git.kubexa.tech
+              value: https://git.example.com
             - name: GITEA_RUNNER_REGISTRATION_TOKEN
               valueFrom:
                 secretKeyRef:

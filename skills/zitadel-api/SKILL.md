@@ -40,7 +40,7 @@ All instance-level operations (create org, create project, create app, create us
 - `iam-admin-pat` — Personal Access Token (simpler, use first)
 - `iam-admin-jwt` — Private Key JWT (use when PAT doesn't have enough permissions)
 
-A regular user's PAT (from Kubexa, Family, or any org) can only manage resources within their own org and project. It cannot create orgs, projects, or users across the instance.
+A regular user's PAT (from Acme, Family, or any org) can only manage resources within their own org and project. It cannot create orgs, projects, or users across the instance.
 
 ### Personal Access Token (PAT)
 
@@ -76,7 +76,7 @@ now = int(time.time())
 assertion = jwt.encode({
     'iss': sa['userId'],
     'sub': sa['userId'],
-    'aud': 'https://auth.kubexa.tech/oauth/v2/token',
+    'aud': 'https://auth.example.com/oauth/v2/token',
     'iat': now,
     'exp': now + 3600
 }, sa['key'], algorithm='RS256')
@@ -84,7 +84,7 @@ print(assertion)
 PYEOF
 )
 
-TOKEN=$(curl -s -X POST "https://auth.kubexa.tech/oauth/v2/token" \
+TOKEN=$(curl -s -X POST "https://auth.example.com/oauth/v2/token" \
   -d "grant_type=client_credentials" \
   -d "scope=urn:zitadel:iam:org:project:id:zitadel:aud" \
   -d "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
@@ -140,7 +140,7 @@ WHERE a.state = 1;
 
 #### 1. List Organizations
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.org.v2.OrganizationService/ListOrganizations" \
+curl -s -X POST "https://auth.example.com/zitadel.org.v2.OrganizationService/ListOrganizations" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
@@ -149,7 +149,7 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.org.v2.OrganizationService/Lis
 
 #### 2. Create Organization
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.org.v2.OrganizationService/CreateOrganization" \
+curl -s -X POST "https://auth.example.com/zitadel.org.v2.OrganizationService/CreateOrganization" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
@@ -161,7 +161,7 @@ Returns `orgId` in response.
 
 #### 3. List Projects
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.project.v2.ProjectService/ListProjects" \
+curl -s -X POST "https://auth.example.com/zitadel.project.v2.ProjectService/ListProjects" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
@@ -170,7 +170,7 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.project.v2.ProjectService/List
 
 #### 4. Create Project
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.project.v2.ProjectService/CreateProject" \
+curl -s -X POST "https://auth.example.com/zitadel.project.v2.ProjectService/CreateProject" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
@@ -190,17 +190,17 @@ Note: `organizationId` is NOT required in v2 body for org-scoped operations. The
 
 #### 5. Create OIDC Application (Authorization Code + PKCE)
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/CreateApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/CreateApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "projectId": "374841528612291196",
+    "projectId": "123456789012345678",
     "name": "Immich",
     "oidcConfiguration": {
       "redirectUris": [
-        "https://immich.kubexa.tech/auth/login",
-        "https://immich.kubexa.tech/user-settings",
+        "https://immich.example.com/auth/login",
+        "https://immich.example.com/user-settings",
         "app.immich:///oauth-callback"
       ],
       "responseTypes": ["OIDC_RESPONSE_TYPE_CODE"],
@@ -211,7 +211,7 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationServ
       "applicationType": "OIDC_APP_TYPE_USER_AGENT",
       "authMethodType": "OIDC_AUTH_METHOD_TYPE_NONE",
       "postLogoutRedirectUris": [
-        "https://immich.kubexa.tech"
+        "https://immich.example.com"
       ],
       "version": "OIDC_VERSION_1_0",
       "accessTokenType": "OIDC_TOKEN_TYPE_BEARER",
@@ -232,16 +232,16 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationServ
 
 #### 6. Create OIDC Application (Client Secret Basic — for oauth2-proxy)
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/CreateApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/CreateApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "projectId": "374841528612291196",
+    "projectId": "123456789012345678",
     "name": "MLflow",
     "oidcConfiguration": {
       "redirectUris": [
-        "https://mlflow.kubexa.tech/oauth2/callback"
+        "https://mlflow.example.com/oauth2/callback"
       ],
       "responseTypes": ["OIDC_RESPONSE_TYPE_CODE"],
       "grantTypes": [
@@ -251,7 +251,7 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationServ
       "applicationType": "OIDC_APP_TYPE_WEB",
       "authMethodType": "OIDC_AUTH_METHOD_TYPE_BASIC",
       "postLogoutRedirectUris": [
-        "https://mlflow.kubexa.tech"
+        "https://mlflow.example.com"
       ],
       "version": "OIDC_VERSION_1_0",
       "accessTokenType": "OIDC_TOKEN_TYPE_BEARER"
@@ -262,13 +262,13 @@ Response includes `clientId` and `clientSecret`. **Save the client_secret — it
 
 #### 7. List Applications
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/ListApplications" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/ListApplications" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
     "filters": [
-      {"projectIdFilter": {"projectId": "374841528612291196"}}
+      {"projectIdFilter": {"projectId": "123456789012345678"}}
     ]
   }' | jq '.applications[] | {id: .applicationId, name: .name, type: (.oidcConfiguration != null) as $oidc | ($oidc | if . then "OIDC" else "") + ((.samlConfiguration != null) as $saml | if $saml then "SAML" else "") + ((.apiConfiguration != null) as $api | if $api then "API" else "")}'
 ```
@@ -277,30 +277,30 @@ Note: Each app response includes one of `oidcConfiguration`, `samlConfiguration`
 
 #### 8. Get Application
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/GetApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/GetApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
-  -d '{"applicationId": "375087551586830269"}' | jq
+  -d '{"applicationId": "123456789012345679"}' | jq
 ```
 
 #### 9. Update Application (OIDC Config)
 Replaces the old REST-style `PATCH /v2/applications/{id}` with RPC-style:
 
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/UpdateApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/UpdateApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "applicationId": "374841611592401532",
-    "projectId": "374841528612291196",
+    "applicationId": "123456789012345680",
+    "projectId": "123456789012345678",
     "oidcConfiguration": {
       "redirectUris": [
-        "https://grafana.kubexa.tech/login/generic_oauth"
+        "https://grafana.example.com/login/generic_oauth"
       ],
       "postLogoutRedirectUris": [
-        "https://grafana.kubexa.tech"
+        "https://grafana.example.com"
       ]
     }
   }' | jq
@@ -311,13 +311,13 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationServ
 #### 9b. Update SAML Application Configuration
 
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/UpdateApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/UpdateApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "applicationId": "375209242610194381",
-    "projectId": "374841528612291196",
+    "applicationId": "123456789012345678",
+    "projectId": "123456789012345678",
     "samlConfiguration": {
       "metadataUrl": "https://sp.example.com/saml/metadata.xml"
     }
@@ -327,13 +327,13 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationServ
 #### 9c. Update API Application Configuration
 
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/UpdateApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/UpdateApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "applicationId": "375209242610194381",
-    "projectId": "374841528612291196",
+    "applicationId": "123456789012345678",
+    "projectId": "123456789012345678",
     "apiConfiguration": {
       "authMethodType": "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
     }
@@ -342,25 +342,25 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationServ
 
 #### 10. Generate New Client Secret (OIDC/API only)
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/GenerateClientSecret" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/GenerateClientSecret" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "applicationId": "374841611592401532",
-    "projectId": "374841528612291196"
+    "applicationId": "123456789012345680",
+    "projectId": "123456789012345678"
   }' | jq -r '.clientSecret'
 ```
 
 #### 11. Delete Application
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/DeleteApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/DeleteApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "applicationId": "375209242610194381",
-    "projectId": "374841528612291196"
+    "applicationId": "123456789012345678",
+    "projectId": "123456789012345678"
   }' | jq
 ```
 
@@ -368,17 +368,17 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationServ
 
 #### 12. Create Human User
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/v2/users/human" \
+curl -s -X POST "https://auth.example.com/v2/users/human" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "eduardas",
+    "username": "jdoe",
     "profile": {
-      "givenName": "Eduardas",
-      "familyName": "Kubexa"
+      "givenName": "Jane",
+"familyName": "Doe"
     },
     "email": {
-      "email": "eduardas@kubexa.tech",
+      "email": "admin@example.com",
       "sendCode": {}
     }
   }' | jq
@@ -386,19 +386,19 @@ curl -s -X POST "https://auth.kubexa.tech/v2/users/human" \
 
 Sets initial password via Management API:
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/management/v1/users/${USER_ID}/password" \
+curl -s -X POST "https://auth.example.com/management/v1/users/${USER_ID}/password" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "x-zitadel-orgid: ${ORG_ID}" \
   -d '{
-    "password": "Eduardas123!",
+    "password": "Jane123!",
     "changeRequired": false
   }' | jq
 ```
 
 #### 13. Get Current User (verify PAT)
 ```bash
-curl -s "https://auth.kubexa.tech/v2/users/me" \
+curl -s "https://auth.example.com/v2/users/me" \
   -H "Authorization: Bearer ${PAT}" | jq
 ```
 
@@ -406,12 +406,12 @@ curl -s "https://auth.kubexa.tech/v2/users/me" \
 
 #### 14. Add Project Role
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.project.v2.ProjectService/AddProjectRole" \
+curl -s -X POST "https://auth.example.com/zitadel.project.v2.ProjectService/AddProjectRole" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "projectId": "374841528612291196",
+    "projectId": "123456789012345678",
     "roleKey": "admin",
     "displayName": "Administrator",
     "group": "default"
@@ -420,11 +420,11 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.project.v2.ProjectService/AddP
 
 #### 15. List Project Roles
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.project.v2.ProjectService/ListProjectRoles" \
+curl -s -X POST "https://auth.example.com/zitadel.project.v2.ProjectService/ListProjectRoles" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
-  -d '{"projectId": "374841528612291196"}' | jq '.result[] | {key: .key, displayName: .displayName}'
+  -d '{"projectId": "123456789012345678"}' | jq '.result[] | {key: .key, displayName: .displayName}'
 ```
 
 #### 16. Assign Project Role to User (v2)
@@ -432,7 +432,7 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.project.v2.ProjectService/List
 Same-org role assignments (user and project in same org). Uses the v2 AuthorizationService.
 
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.authorization.v2.AuthorizationService/CreateAuthorization" \
+curl -s -X POST "https://auth.example.com/zitadel.authorization.v2.AuthorizationService/CreateAuthorization" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
@@ -448,7 +448,7 @@ Response returns `id` and `creationDate`.
 #### 17. List Role Assignments (Authorizations)
 
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.authorization.v2.AuthorizationService/ListAuthorizations" \
+curl -s -X POST "https://auth.example.com/zitadel.authorization.v2.AuthorizationService/ListAuthorizations" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
@@ -460,12 +460,12 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.authorization.v2.Authorization
 By default, all users in the ZITADEL instance can authenticate to any project's apps. Enable `projectRoleCheck` to require role assignments.
 
 ```bash
-curl -s -X PUT "https://auth.kubexa.tech/management/v1/projects/${PROJECT_ID}" \
+curl -s -X PUT "https://auth.example.com/management/v1/projects/${PROJECT_ID}" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "x-zitadel-orgid: ${ORG_ID}" \
   -d '{
-    "name": "Kubexa",
+    "name": "Acme",
     "projectRoleAssertion": true,
     "projectRoleCheck": true,
     "hasProjectCheck": false
@@ -482,7 +482,7 @@ curl -s -X PUT "https://auth.kubexa.tech/management/v1/projects/${PROJECT_ID}" \
 
 For granting access to users from a DIFFERENT organization:
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/management/v1/projects/${PROJECT_ID}/grants" \
+curl -s -X POST "https://auth.example.com/management/v1/projects/${PROJECT_ID}/grants" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "x-zitadel-orgid: ${ORG_ID}" \
@@ -513,12 +513,12 @@ SAML apps use the same `CreateApplication` endpoint with `samlConfiguration`. No
 #### 5a. Create SAML Application (Metadata XML)
 
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/CreateApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/CreateApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "projectId": "374841528612291196",
+    "projectId": "123456789012345678",
     "name": "Enterprise SAML App",
     "samlConfiguration": {
       "metadataXml": "<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"https://sp.example.com/saml\">\n  <md:SPSSODescriptor protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n    <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://sp.example.com/saml/acs\" index=\"0\"/>\n  </md:SPSSODescriptor>\n</md:EntityDescriptor>"
@@ -529,12 +529,12 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationServ
 #### 5b. Create SAML Application (Metadata URL)
 
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/CreateApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/CreateApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "projectId": "374841528612291196",
+    "projectId": "123456789012345678",
     "name": "Enterprise SAML App",
     "samlConfiguration": {
       "metadataUrl": "https://sp.example.com/saml/metadata.xml"
@@ -557,12 +557,12 @@ API apps authenticate at the introspection endpoint using client credentials. No
 #### 5c. Create API Application (Basic Auth)
 
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/CreateApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/CreateApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "projectId": "374841528612291196",
+    "projectId": "123456789012345678",
     "name": "API Client",
     "apiConfiguration": {
       "authMethodType": "API_AUTH_METHOD_TYPE_BASIC"
@@ -573,9 +573,9 @@ curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationServ
 Response:
 ```json
 {
-  "applicationId": "375209242610194381",
+  "applicationId": "123456789012345678",
   "apiConfiguration": {
-    "clientId": "375209242610194381@myproject",
+    "clientId": "123456789012345678@myproject",
     "clientSecret": "gjoq34589uasgh"
   }
 }
@@ -584,12 +584,12 @@ Response:
 #### 5d. Create API Application (Private Key JWT)
 
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/CreateApplication" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/CreateApplication" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "projectId": "374841528612291196",
+    "projectId": "123456789012345678",
     "name": "API Client (JWT)",
     "apiConfiguration": {
       "authMethodType": "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
@@ -601,13 +601,13 @@ Response has `clientId` but no `clientSecret` (auth uses JWT assertion signed wi
 
 For Private Key JWT, create an application key to sign assertions:
 ```bash
-curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/CreateApplicationKey" \
+curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/CreateApplicationKey" \
   -H "Authorization: Bearer ${PAT}" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
   -d '{
-    "applicationId": "375209242610194381",
-    "projectId": "374841528612291196",
+    "applicationId": "123456789012345678",
+    "projectId": "123456789012345678",
     "keyType": "APPLICATION_KEY_TYPE_JSON"
   }' | jq -r '.keyDetails' | base64 -d
 ```
@@ -628,7 +628,7 @@ Creates a complete org from scratch with a human user, project, roles, OIDC app,
 
 ```bash
 export PAT=$(kubectl get secret iam-admin-pat -n zitadel -o jsonpath='{.data.pat}' | base64 -d)
-export BASE="https://auth.kubexa.tech"
+export BASE="https://auth.example.com"
 
 # 1. Create organization
 ORG_RESP=$(curl -s -X POST "$BASE/zitadel.org.v2.OrganizationService/CreateOrganization" \
@@ -663,9 +663,9 @@ USER_RESP=$(curl -s -X POST "$BASE/v2/users/human" \
   -H "Authorization: Bearer $PAT" \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "eduardas",
-    "profile": {"givenName": "Eduardas", "familyName": "Kubexa"},
-    "email": {"email": "eduardas@kubexa.tech", "sendCode": {}}
+    "username": "jdoe",
+    "profile": {"givenName": "Jane", "familyName": "Acme"},
+    "email": {"email": "admin@example.com", "sendCode": {}}
   }')
 USER_ID=$(echo "$USER_RESP" | jq -r '.userId')
 echo "User: $USER_ID"
@@ -695,12 +695,12 @@ APP_RESP=$(curl -s -X POST "$BASE/zitadel.application.v2.ApplicationService/Crea
     "projectId": "'$PROJ_ID'",
     "name": "Immich",
     "oidcConfiguration": {
-      "redirectUris": ["https://immich.kubexa.tech/auth/login", "app.immich:///oauth-callback"],
+      "redirectUris": ["https://immich.example.com/auth/login", "app.immich:///oauth-callback"],
       "responseTypes": ["OIDC_RESPONSE_TYPE_CODE"],
       "grantTypes": ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"],
       "applicationType": "OIDC_APP_TYPE_USER_AGENT",
       "authMethodType": "OIDC_AUTH_METHOD_TYPE_NONE",
-      "postLogoutRedirectUris": ["https://immich.kubexa.tech"],
+      "postLogoutRedirectUris": ["https://immich.example.com"],
       "version": "OIDC_VERSION_1_0",
       "accessTokenType": "OIDC_TOKEN_TYPE_BEARER"
     }
@@ -719,13 +719,13 @@ Full flow for creating an oauth2-proxy OIDC app and immediately saving credentia
 set -euo pipefail
 
 PAT=$(kubectl get secret iam-admin-pat -n zitadel -o jsonpath='{.data.pat}' | base64 -d)
-PROJECT_ID="374841528612291196"  # Kubexa project
+PROJECT_ID="123456789012345678"  # Acme project
 APP_NAME="MyApp"
-REDIRECT_URI="https://myapp.kubexa.tech/oauth2/callback"
+REDIRECT_URI="https://myapp.example.com/oauth2/callback"
 NAMESPACE="myapp"
 
 # Create app with client_secret_basic auth
-APP_RESP=$(curl -s -X POST "https://auth.kubexa.tech/zitadel.application.v2.ApplicationService/CreateApplication" \
+APP_RESP=$(curl -s -X POST "https://auth.example.com/zitadel.application.v2.ApplicationService/CreateApplication" \
   -H "Authorization: Bearer $PAT" \
   -H "Content-Type: application/json" \
   -H "Connect-Protocol-Version: 1" \
@@ -763,9 +763,9 @@ echo "Stored in secret ${APP_NAME}-oidc-secret in namespace $NAMESPACE"
 
 ```bash
 export PAT=$(kubectl get secret iam-admin-pat -n zitadel -o jsonpath='{.data.pat}' | base64 -d)
-export BASE="https://auth.kubexa.tech"
-export PROJ_ID="374841528612291196"
-export APP_ID="374841611592401532"
+export BASE="https://auth.example.com"
+export PROJ_ID="123456789012345678"
+export APP_ID="123456789012345680"
 
 # Update redirect URIs
 curl -s -X POST "$BASE/zitadel.application.v2.ApplicationService/UpdateApplication" \
@@ -776,8 +776,8 @@ curl -s -X POST "$BASE/zitadel.application.v2.ApplicationService/UpdateApplicati
     "applicationId": "'$APP_ID'",
     "projectId": "'$PROJ_ID'",
     "oidcConfiguration": {
-      "redirectUris": ["https://grafana.kubexa.tech/login/generic_oauth"],
-      "postLogoutRedirectUris": ["https://grafana.kubexa.tech"]
+      "redirectUris": ["https://grafana.example.com/login/generic_oauth"],
+      "postLogoutRedirectUris": ["https://grafana.example.com"]
     }
   }' | jq
 
@@ -827,12 +827,12 @@ POST /zitadel.application.v2.ApplicationService/UpdateApplication
 
 ```bash
 export PAT=$(kubectl get secret iam-admin-pat -n zitadel -o jsonpath='{.data.pat}' | base64 -d)
-PROJ_ID="374841528612291196"
+PROJ_ID="123456789012345678"
 ORG_ID="374839521201686400"
 
 # Create roles in one loop
 for role in admin viewer editor auditor operator; do
-  curl -s -X POST "https://auth.kubexa.tech/zitadel.project.v2.ProjectService/AddProjectRole" \
+  curl -s -X POST "https://auth.example.com/zitadel.project.v2.ProjectService/AddProjectRole" \
     -H "Authorization: Bearer $PAT" \
     -H "Content-Type: application/json" \
     -H "Connect-Protocol-Version: 1" \
@@ -850,7 +850,7 @@ for user_id in "${!USERS[@]}"; do
   roles="${USERS[$user_id]}"
   roles_json=$(echo "$roles" | jq -R 'split(",")')
   
-  curl -s -X POST "https://auth.kubexa.tech/zitadel.authorization.v2.AuthorizationService/CreateAuthorization" \
+  curl -s -X POST "https://auth.example.com/zitadel.authorization.v2.AuthorizationService/CreateAuthorization" \
     -H "Authorization: Bearer $PAT" \
     -H "Content-Type: application/json" \
     -H "Connect-Protocol-Version: 1" \
