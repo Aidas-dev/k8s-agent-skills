@@ -7,7 +7,7 @@
 
 Agent skills for Kubernetes cluster operations tooling. Each skill is a self-contained `SKILL.md` designed for agentic AI tools (OpenCode, Claude Code, Codex, Cursor) that load skills for task-specific expertise.
 
-Designed for: **Cilium, Talos, Flux, Rook-Ceph, CNPG, ZITADEL, Gitea, Tekton, Cert-Manager, VictoriaMetrics, Harbor, Higress, KServe, Kubeflow, Vault, ExternalDNS, External Secrets, Dragonfly, Flagger, MariaDB, Vector, Sealed Secrets, Stakater Reloader, NVIDIA GPU, Atlas, Nextcloud** and more.
+Designed for: **Cilium, Talos, Flux, Rook-Ceph, CNPG, ZITADEL, Gitea, Tekton, Cert-Manager, VictoriaMetrics, Harbor, Higress, KServe, Kubeflow, Vault, ExternalDNS, External Secrets, Dragonfly, Flagger, MariaDB, Vector, Sealed Secrets, Stakater Reloader, NVIDIA GPU, Atlas, Nextcloud, Tailscale** and more.
 
 ## Quick Start
 
@@ -85,6 +85,8 @@ npx skills-link --dry-run     # preview without linking
 | [rook-ceph-toolbox](skills/rook-ceph-toolbox/SKILL.md) | Ceph CLI — health, OSD mgmt, RBD, RGW, CRUSH | None (toolbox ops) |
 | [sealed-secrets](skills/sealed-secrets/SKILL.md) | Encrypted Secrets for GitOps, kubeseal, key rotation | SealedSecret |
 | [stakater-reloader](skills/stakater-reloader/SKILL.md) | ConfigMap/Secret reload, annotations, Helm values | None (annotation-based) |
+| [tailscale](skills/tailscale/SKILL.md) | Tailscale router — CLI, status, ping, Talos integration | Router → sub-skills |
+| [tailscale-talos](skills/tailscale/tailscale-talos/SKILL.md) | Tailscale on Talos — system extension, machine config, subnet routes | None |
 | [talos](skills/talos/SKILL.md) | Talos Linux — cluster deploy, machine config, upgrades, talosctl | None |
 | [tekton](skills/tekton/SKILL.md) | Tekton pipelines — resolver refs, matrix, CEL, TTL | Task, Pipeline, etc. |
 | [vault](skills/vault/SKILL.md) | Vault router — Helm, API, Terraform | Router → sub-skills |
