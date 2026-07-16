@@ -5,9 +5,11 @@ description: Use when deploying or managing Rook-Ceph CRDs — CephCluster, Ceph
 
 # Rook-Ceph Operator CRDs
 
-Charts: `rook-ceph` + `rook-ceph-cluster` from `https://charts.rook.io/release`  
-Latest: **v1.19.5** (charts) | Ceph: **v20.2.1** (Tentacle) | API: `ceph.rook.io/v1`  
-**Always upgrade in order:** `rook-ceph` → `ceph-csi-driver` (v1.20+) → `rook-ceph-cluster`
+Charts: `rook-ceph` + `rook-ceph-cluster` (from `https://charts.rook.io/release`) + `ceph-csi-drivers` (v1.20+, from `https://charts.ceph.io/ceph-csi-operator`)  
+Latest: **v1.20.x** (charts) | Ceph: **v20.2.2** (Tentacle) | API: `ceph.rook.io/v1`  
+**Install/upgrade order:** `rook-ceph` → `ceph-csi-drivers` → `rook-ceph-cluster`
+
+> **⚠️ v1.20 breaking change:** CSI drivers are now managed by the separate `ceph-csi-drivers` Helm chart. Rook no longer creates CSI ServiceAccounts, RBAC, or Driver CRs. **Without this chart, all PVC provisioning breaks.** See [Upgrade Notes](#upgrade-notes-v119--v120) below.
 
 ## CRD Reference
 
@@ -103,39 +105,73 @@ spec:
 | S3 bucket notifications | CephBucketTopic + CephBucketNotification | Kafka/AMQP/webhook |
 | Tenant isolation in pool | CephBlockPoolRadosNamespace | Per-namespace RADOS namespace |
 
-## Operator CSI Settings
+## ceph-csi-drivers Chart (v1.20+)
+
+**CRITICAL:** Rook v1.20 delegates CSI driver management to the `ceph-csi-operator` sub-chart (bundled with `rook-ceph`) + the separate `ceph-csi-drivers` chart. The drivers chart creates the ServiceAccounts, RBAC, and `Driver` CRs that the operator needs.
+
+**Always websearch** `rook/docs/v1.20/Helm-Charts/csi-drivers-chart/` for the latest recommended `values.yaml` before installing.
+
+### Installation
+
+```bash
+helm repo add ceph-csi-operator https://charts.ceph.io/ceph-csi-operator
+helm install ceph-csi-drivers ceph-csi-operator/ceph-csi-drivers \
+  --namespace rook-ceph \
+  -f https://raw.githubusercontent.com/rook/rook/v1.20.2/deploy/charts/ceph-csi-drivers/values.yaml
+```
+
+### Critical: Driver Names Must Match StorageClasses
+
+The `ceph-csi-drivers` chart defaults to driver names like `rbd.csi.ceph.com`, but existing StorageClasses reference `rook-ceph.rbd.csi.ceph.com` (prefixed with the operator namespace). **Set the correct names:**
 
 ```yaml
-# In rook-ceph helm chart values
-csi:
-  enableRbdDriver: true
-  enableCephfsDriver: true
-  enableRBDSnapshotter: true
-  provisionerReplicas: 2
-  enableCSIHostNetwork: true  # needed if SDN blocks external clusters
-  topology:
+drivers:
+  rbd:
+    enabled: true
+    name: rook-ceph.rbd.csi.ceph.com     # Must match StorageClass provisioner
+  cephfs:
+    enabled: true
+    name: rook-ceph.cephfs.csi.ceph.com   # Must match StorageClass provisioner
+  nfs:
     enabled: false
-  rbdFSGroupPolicy: "File"
-  cephFSFSGroupPolicy: "File"
-  csiRBDPluginResource: |
-    - name: driver-registrar
-      resource:
-        requests:
-          memory: 32Mi
-          cpu: 5m
-    - name: csi-rbdplugin
-      resource:
-        requests:
-          memory: 128Mi
-          cpu: 20m
+  nvmeof:
+    enabled: false
 ```
+
+Wrong names → StorageClass provisioner mismatch, volumes fail to provision.
 
 ## Upgrade Notes (v1.19 → v1.20)
 
-- v1.20 requires `ceph-csi-driver` subchart between rook-ceph and rook-ceph-cluster
-- Ceph v20.2.0 has a read-affinity corruption bug — use v20.2.1+
-- Rook v1.20 changes Ceph image config format (separate repo + tag fields)
-- Always upgrade operator before cluster chart
+### Breaking: CSI drivers moved to separate chart
+
+In v1.19, Rook managed CSI drivers internally. In v1.20, a new `ceph-csi-operator` manages them via `Driver` CRs, and the `ceph-csi-drivers` Helm chart is **required** to create the backing ServiceAccounts + RBAC.
+
+**Installation order:** `rook-ceph` → `ceph-csi-drivers` → `rook-ceph-cluster`
+
+### Known Issues (websearch before deploying)
+
+1. **v1.20.0: Missing SA/RBAC** — Without `ceph-csi-drivers` chart, ctrlplugin Deployments stuck at 0/2 with `serviceaccount not found`. Fixed by installing the drivers chart with correct driver names. (rook#17644)
+
+2. **v1.20.1: Leader election broken** — RoleBindings only included prefixed SA names, but pods use unprefixed names (`rbd-ctrlplugin-sa`). Provisioner can't acquire lease → PVCs hang. Fixed in v1.20.2 or patch RoleBindings to add unprefixed SAs. (rook#17787)
+
+3. **Helm upgrade conflicts** — Server-side apply may conflict with existing `Driver`/`OperatorConfig` CRs managed by Rook. Add `--force-conflicts` or delete old CRs before upgrade.
+
+4. **Ceph v20.2.0 read-affinity bug** — Use v20.2.1+ or v20.2.2.
+
+### Migration Steps
+
+1. Upgrade `rook-ceph` chart to v1.20 (this deploys ceph-csi-operator sub-chart)
+2. Retrieve existing CSI settings from your `rook-ceph-operator-config` ConfigMap
+3. Install `ceph-csi-drivers` chart with driver names matching your StorageClasses
+4. If upgrade fails with apply conflicts, use `helm upgrade --force-conflicts`
+5. Verify: `kubectl get deploy -n rook-ceph -l app.kubernetes.io/name=rbd` shows ctrlplugin + nodeplugin running
+6. Upgrade `rook-ceph-cluster` chart
+
+### Config Changes
+
+- CSI settings removed from `rook-ceph-operator-config` ConfigMap — now managed via `OperatorConfig` + `Driver` CRs
+- CSI custom images remain in `rook-ceph` chart values (`csi.csiOperator.controllerManager.manager.env`)
+- `rookUseCsiOperator: true` is the new default in v1.20
 
 ## Common Mistakes
 
