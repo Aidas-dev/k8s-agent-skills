@@ -64,6 +64,9 @@
     "provenance": true,
     "tag": "latest"
   },
+  "scripts": {
+    "postinstall": "./bin/skills-link --global --check > /dev/null 2>&1 || ./bin/skills-link --global"
+  },
   "engines": {
     "node": ">=18"
   }

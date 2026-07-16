@@ -5,10 +5,39 @@
 [![Publish](https://github.com/Aidas-dev/k8s-agent-skills/actions/workflows/publish.yml/badge.svg)](https://github.com/Aidas-dev/k8s-agent-skills/actions/workflows/publish.yml)
 [![GitHub stars](https://img.shields.io/github/stars/Aidas-dev/k8s-agent-skills?style=flat)](https://github.com/Aidas-dev/k8s-agent-skills)
 
-Agent skills for Kubernetes cluster operations tooling. Each skill is a self-contained `SKILL.md` designed for agentic AI tools (Claude Code, OpenCode, Codex) that load skills for task-specific expertise.
+Agent skills for Kubernetes cluster operations tooling. Each skill is a self-contained `SKILL.md` designed for agentic AI tools (OpenCode, Claude Code, Codex, Cursor) that load skills for task-specific expertise.
 
-**npm:** [`k8s-agent-skills`](https://www.npmjs.com/package/k8s-agent-skills)
-**GitHub:** [`Aidas-dev/k8s-agent-skills`](https://github.com/Aidas-dev/k8s-agent-skills)
+Designed for: **Cilium, Talos, Flux, Rook-Ceph, CNPG, ZITADEL, Gitea, Tekton, Cert-Manager, VictoriaMetrics, Harbor, Higress, KServe, Kubeflow, Vault, ExternalDNS, External Secrets, Dragonfly, Flagger, MariaDB, Vector, Sealed Secrets, Stakater Reloader, NVIDIA GPU, Atlas, Nextcloud** and more.
+
+## Quick Start
+
+```bash
+# Install
+npm install --save-dev k8s-agent-skills
+
+# Skills auto-link to ~/.agents/skills/ + ~/.config/opencode/skills/ + ~/.claude/skills/
+# + ~/.codex/skills/ + ~/.cursor/skills/ on install.
+# Just restart your AI agent — skills are ready to use.
+
+# To manually re-link (e.g. after npm update):
+npx skills-link --global
+
+# Check all skills are linked:
+npx skills-link --global --check
+```
+
+Skills use **symlinks**, so content always reflects the latest package version. `npm update` + automatic `postinstall` = skills stay current.
+
+### Per-agent linking (manual)
+
+```bash
+npx skills-link               # ~/.agents/skills/ only (default)
+npx skills-link --opencode    # ~/.config/opencode/skills/
+npx skills-link --claude      # ~/.claude/skills/
+npx skills-link --codex       # ~/.codex/skills/
+npx skills-link --cursor      # ~/.cursor/skills/
+npx skills-link --dry-run     # preview without linking
+```
 
 ## Skills
 
@@ -72,50 +101,35 @@ Agent skills for Kubernetes cluster operations tooling. Each skill is a self-con
 | [zitadel-helm](skills/zitadel-helm/SKILL.md) | ZITADEL Helm — CNPG, Gateway API, caches, masterkey | None |
 | [zitadel-terraform](skills/zitadel-terraform/SKILL.md) | ZITADEL Terraform provider — 80+ resources, 40+ data sources | None |
 
-## Usage
+## How It Works
 
-### Via npm (recommended)
+Skills are **symlinked** from the npm package to your agent's skill directory:
 
-```bash
-npm install --save-dev k8s-agent-skills
-# or
-bun add -d k8s-agent-skills
-
-# Symlink skills to ~/.agents/skills/ (OpenCode default)
-npx skills-link
-
-# To specific agent directories:
-npx skills-link --agents    # ~/.agents/skills/
-npx skills-link --opencode  # ~/.config/opencode/skills/
-npx skills-link --claude    # ~/.claude/skills/
-npx skills-link --codex     # ~/.codex/skills/
-npx skills-link --cursor    # ~/.cursor/skills/
-
-# To ALL known agent directories at once:
-npx skills-link --global
-
-# Preview without linking:
-npx skills-link --global --dry-run
-
-# Verify all skills are linked (exit 1 if drift found):
-npx skills-link --global --check
+```
+node_modules/k8s-agent-skills/skills/cilium-network/SKILL.md
+  → ~/.agents/skills/cilium-network/SKILL.md  (OpenCode)
+  → ~/.config/opencode/skills/cilium-network/  (OpenCode config)
+  → ~/.claude/skills/cilium-network/            (Claude Code)
+  → ~/.codex/skills/cilium-network/             (Codex CLI)
+  → ~/.cursor/skills/cilium-network/            (Cursor)
 ```
 
-### Via git clone
+This means:
+- **Skill content updates instantly** on `npm update` — symlinks are live
+- **New skills auto-link** via `postinstall` script on package install
+- **Stale symlinks** (skills removed from a release) are cleaned automatically
+- Run `npx skills-link --global --check` any time to verify
+
+## Manual Installation
 
 ```bash
+# git clone (if not using npm)
 git clone https://github.com/Aidas-dev/k8s-agent-skills.git
-ln -sf $(pwd)/k8s-agent-skills/skills/* ~/.agents/skills/
-```
+cd k8s-agent-skills
+./bin/skills-link --global
 
-### Manual copy
-
-```bash
-# OpenCode / Codex
-cp -r skills/vector ~/.agents/skills/
-
-# Claude Code Desktop
-cp -r skills/external-dns ~/.claude/skills/
+# Or symlink manually
+ln -sf $(pwd)/skills/* ~/.agents/skills/
 ```
 
 ## npm Publishing
@@ -123,10 +137,7 @@ cp -r skills/external-dns ~/.claude/skills/
 Auto-publishes on `v*` tag push via GitHub Actions with OIDC Trusted Publisher — no tokens needed.
 
 ```bash
-# Bump version
 npm version patch  # or minor / major
-
-# Tag and push
 git push origin main --tags
 git push github main --tags
 ```
