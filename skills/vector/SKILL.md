@@ -1,3 +1,8 @@
+---
+name: vector
+description: Use when working with Vector — observability data pipeline, Helm deployment, or operator CRDs. Triggers: vector, observability pipeline, log shipping, metrics.
+---
+
 # Vector — Skill Router
 
 Pick the right sub-skill.

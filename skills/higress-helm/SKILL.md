@@ -1,3 +1,8 @@
+---
+name: higress-helm
+description: Deploy, configure, or upgrade Higress AI Gateway on Kubernetes via Helm chart. Covers Gateways, plugins, Ingress/CRD routing, observability, and production patterns.
+---
+
 # Higress — Helm Chart
 
 **Repo:** `https://higress.io/helm-charts`  

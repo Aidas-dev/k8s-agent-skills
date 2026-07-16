@@ -1,3 +1,8 @@
+---
+name: higress
+description: Use when working with Higress — AI Gateway, Wasm plugins, Ingress, Helm deployment, or operator CRDs. Triggers: higress, AI Gateway, WasmPlugin, McpBridge.
+---
+
 # Higress — Skill Router
 
 Pick the right sub-skill.

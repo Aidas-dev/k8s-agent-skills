@@ -1,3 +1,8 @@
+---
+name: kserve-helm
+description: Deploy KServe on Kubernetes via Helm — 10 charts, Serverless/RawDeployment/ModelMesh modes, KServe/ModelMesh/annotator/router configurations.
+---
+
 # KServe — Helm Deployment
 
 **Repo:** `https://kserve.github.io/helm-charts`  

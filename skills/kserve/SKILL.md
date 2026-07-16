@@ -1,3 +1,8 @@
+---
+name: kserve
+description: Use when working with KServe — model inference, ServingRuntime, InferenceService, Helm deployment, or operator CRDs. Triggers: kserve, InferenceService, model serving, ModelMesh.
+---
+
 # KServe — Skill Router
 
 Pick the right sub-skill.

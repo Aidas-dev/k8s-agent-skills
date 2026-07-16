@@ -197,6 +197,14 @@ Only `users` subcommand currently. Requires login with admin privileges.
 - For actions: check workflow runs with `ls` before `cancel`/`delete`.
 - If command fails, capture `tea <subcommand> --help` output and adapt flags to installed version.
 
+## Common Mistakes
+
+- **Wrong login profile** — Running `tea` commands without `--login` uses the default profile. If multiple Gitea instances are configured, always pass `--login <profile>`.
+- **Missing push before PR** — `tea pulls create` does not push your branch. Run `git push -u origin <branch>` first.
+- **teav1 vs v0 flags** — Ensure `tea` version supports the flags you're using. Run `tea <cmd> --help` to verify before scripting.
+- **Webhook secrets in output** — `tea webhooks create` with `--secret` may leak the secret in shell history. Use `--secret-stdin` or env vars.
+- **Actions runner registration** — Token must be pre-created in Gitea admin UI (Settings → Actions → Runners). The CLI `tea actions` commands don't create tokens.
+
 ## Troubleshooting
 
 - Auth failures: re-check login profile URL/token; verify `tea logins ls`.

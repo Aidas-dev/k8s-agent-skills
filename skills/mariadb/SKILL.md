@@ -1,3 +1,8 @@
+---
+name: mariadb
+description: Use when working with MariaDB operator — Helm deployment, operator CRDs, Galera HA, MaxScale, or backups. Triggers: mariadb, Galera, MaxScale, PITR.
+---
+
 # MariaDB Operator — Skill Router
 
 Pick the right sub-skill.

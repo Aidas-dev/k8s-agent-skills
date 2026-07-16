@@ -1,3 +1,8 @@
+---
+name: vector-operator
+description: Create and manage Vector operator CRDs (kaasops) — Vector, VectorPipeline, ClusterVectorPipeline, VectorAggregator, ClusterVectorAggregator, with auto-routing by source type.
+---
+
 # Vector Operator (kaasops)
 
 **Repository:** `github.com/kaasops/vector-operator`  

@@ -1,3 +1,8 @@
+---
+name: vector-helm
+description: Deploy Vector on Kubernetes via Helm — Agent/Aggregator/Stateless roles, customConfig, sources, transforms, sinks, and production patterns.
+---
+
 # Vector — Helm Chart
 
 **Repo:** `https://helm.vector.dev`  

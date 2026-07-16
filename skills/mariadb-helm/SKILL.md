@@ -1,3 +1,8 @@
+---
+name: mariadb-helm
+description: Deploy MariaDB operator on Kubernetes via Helm — 3 charts, production HA values, Galera, MaxScale, backups, PITR configuration.
+---
+
 # MariaDB Operator — Helm Charts
 
 **Repository:** `https://mariadb-operator.github.io/mariadb-operator`  

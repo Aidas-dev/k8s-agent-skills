@@ -1,3 +1,8 @@
+---
+name: mariadb-operator
+description: Create and manage MariaDB operator CRDs — 12 CRDs under k8s.mariadb.com, Galera HA, MaxScale, backups, PITR, monitoring, and connection pooling.
+---
+
 # MariaDB Operator CRDs
 
 **Repository:** `github.com/mariadb-operator/mariadb-operator`  

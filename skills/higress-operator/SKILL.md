@@ -1,3 +1,8 @@
+---
+name: higress-operator
+description: Create and manage Higress CRDs — WasmPlugin, Http2Rpc, McpBridge, AI Gateway, 41 Wasm plugins, 16 AI provider integrations, and Gateway configuration.
+---
+
 # Higress — Operator CRDs & Configuration
 
 **Repository:** `github.com/alibaba/higress`  

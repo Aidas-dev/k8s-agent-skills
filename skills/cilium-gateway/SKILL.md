@@ -273,7 +273,7 @@ kubectl get ciliumenvoyconfigs -A
 kubectl get crd | grep gateway.networking.k8s.io
 ```
 
-### Common Errors
+## Common Mistakes
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | GatewayClass not found | Gateway API CRDs not installed | Install v1.4.1 CRDs |

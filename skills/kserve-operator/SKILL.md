@@ -1,3 +1,8 @@
+---
+name: kserve-operator
+description: Create and manage KServe CRDs — InferenceService, ServingRuntime, InferenceGraph, LLMInferenceService, LocalModel, ClusterServingRuntime, and 22 CRDs under serving.kserve.io.
+---
+
 # KServe — Operator CRDs & Configuration
 
 **Repository:** `github.com/kserve/kserve`  

@@ -284,6 +284,17 @@ Returns: `displayname`, `email`, `phone`, `address`, `website`, `twitter`.
 | 112 | Password change not supported by backend |
 | 113 | Editing field not allowed or doesn't exist |
 
+## Common Mistakes
+
+- **Missing OCS-APIRequest header** — Every request needs `OCS-APIRequest: true`. Without it, requests return empty responses or 404.
+- **Wrong base path** — Use `ocs/v1.php/cloud/`, not `ocs/v2.php/`. The v2 path is for the Share API, not Provisioning.
+- **Password with welcome email** — Creating a user without a password AND without an email sends no welcome email. Always provide `email` when omitting `password`.
+- **XML vs JSON** — Default output is XML. For machine parsing, always append `?format=json`. Python XML parsing of Nextcloud responses can fail on missing tags.
+- **Group deletion** — Deleting a group does not delete its users. Users remain ungrouped.
+- **Cannot delete admin group** — The `admin` group is protected. You cannot remove users from it via API.
+- **POST needs form-urlencoded** — POST/PUT requests must use `Content-Type: application/x-www-form-urlencoded`. JSON body is not accepted by the OCS API.
+- **Quota format** — `unlimited` works but `0` does not mean unlimited. Use `-3` (negative bytes) for unlimited in the API field.
+
 ## Tips
 
 - **JSON output** — Append `?format=json` to any endpoint URL for JSON responses instead of XML
