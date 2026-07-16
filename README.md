@@ -47,7 +47,11 @@ Agent skills for Kubernetes cluster operations tooling. Each skill is a self-con
 | [mariadb](skills/mariadb/SKILL.md) | MariaDB router — operator CRDs, Helm | Router → sub-skills |
 | [mariadb-helm](skills/mariadb-helm/SKILL.md) | MariaDB operator Helm — 3 charts, production HA values | None |
 | [mariadb-operator](skills/mariadb-operator/SKILL.md) | MariaDB operator — 12 CRDs, Galera HA, MaxScale, backups, PITR | 12 CRDs under k8s.mariadb.com |
+| [nextcloud](skills/nextcloud/SKILL.md) | Nextcloud router — Helm deployment, Provisioning API | Router → sub-skills |
+| [nextcloud-helm](skills/nextcloud/nextcloud-helm/SKILL.md) | Nextcloud Helm chart — NC34, S3, Imaginary, Collabora, cron | None |
+| [nextcloud-api](skills/nextcloud/nextcloud-api/SKILL.md) | Nextcloud Provisioning API — users, groups, apps | None |
 | [nvidia-device-plugin](skills/nvidia-device-plugin/SKILL.md) | GPU discovery, GFD, NFD, CDI, MIG, time-slicing | None (ConfigMap) |
+| [rook-ceph](skills/rook-ceph/SKILL.md) | Rook-Ceph router — operator CRDs, toolbox CLI | Router → sub-skills |
 | [rook-ceph-operator](skills/rook-ceph-operator/SKILL.md) | Ceph cluster, block pools, object store, NFS, CSI | CephCluster, CephBlockPool, CephObjectStore, etc. |
 | [rook-ceph-toolbox](skills/rook-ceph-toolbox/SKILL.md) | Ceph CLI — health, OSD mgmt, RBD, RGW, CRUSH | None (toolbox ops) |
 | [sealed-secrets](skills/sealed-secrets/SKILL.md) | Encrypted Secrets for GitOps, kubeseal, key rotation | SealedSecret |
