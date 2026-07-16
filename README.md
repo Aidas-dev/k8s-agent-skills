@@ -81,14 +81,24 @@ npm install --save-dev k8s-agent-skills
 # or
 bun add -d k8s-agent-skills
 
-# Symlink all skills to ~/.agents/skills/ (OpenCode)
+# Symlink skills to ~/.agents/skills/ (OpenCode default)
 npx skills-link
 
-# Or to other agent directories:
-npx skills-link --claude     # Claude Code  (~/.claude/skills/)
-npx skills-link --codex      # Codex CLI    (~/.codex/skills/)
-npx skills-link --cursor     # Cursor       (~/.cursor/skills/)
-npx skills-link --all        # all known agent dirs
+# To specific agent directories:
+npx skills-link --agents    # ~/.agents/skills/
+npx skills-link --opencode  # ~/.config/opencode/skills/
+npx skills-link --claude    # ~/.claude/skills/
+npx skills-link --codex     # ~/.codex/skills/
+npx skills-link --cursor    # ~/.cursor/skills/
+
+# To ALL known agent directories at once:
+npx skills-link --global
+
+# Preview without linking:
+npx skills-link --global --dry-run
+
+# Verify all skills are linked (exit 1 if drift found):
+npx skills-link --global --check
 ```
 
 ### Via git clone

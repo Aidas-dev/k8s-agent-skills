@@ -2,17 +2,25 @@
 set -euo pipefail
 
 # skills-link — Symlink k8s-agent-skills to agent skill directories
-# Usage:
-#   skills-link                    # link to ~/.agents/skills/ (OpenCode)
-#   skills-link --claude           # link to ~/.claude/skills/  (Claude Code)
-#   skills-link --codex            # link to ~/.codex/skills/  (Codex CLI)
-#   skills-link --cursor           # link to ~/.cursor/skills/ (Cursor)
-#   skills-link --all              # link to all known agent dirs
 #
-# Cleans up broken symlinks (removed skills) before linking.
+# Auto-update: Uses SYMLINKS, so skill CONTENT always reflects the latest
+# source. git pull / npm update = instant update. Stale symlinks (skills
+# removed from package) are cleaned up automatically. Only re-run when
+# NEW skills are added to the package (--check detects this).
+#
+# Usage:
+#   skills-link                    # link to ~/.agents/skills/ (OpenCode default)
+#   skills-link --agents           # ~/.agents/skills/
+#   skills-link --opencode         # ~/.config/opencode/skills/
+#   skills-link --claude           # ~/.claude/skills/
+#   skills-link --codex            # ~/.codex/skills/
+#   skills-link --cursor           # ~/.cursor/skills/
+#   skills-link --global           # all above
+#   skills-link --all              # alias for --global
+#   skills-link --check            # verify all skills linked, exit 1 if not
+#   skills-link --dry-run          # preview without linking
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-# Package root is parent of bin/
 PKG_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 SKILLS_DIR="$PKG_DIR/skills"
 
@@ -22,38 +30,53 @@ if [ ! -d "$SKILLS_DIR" ]; then
   exit 1
 fi
 
-declare -a TARGETS
+# All known agent skill directories
+ALL_TARGETS=(
+  "$HOME/.agents/skills"
+  "$HOME/.config/opencode/skills"
+  "$HOME/.claude/skills"
+  "$HOME/.codex/skills"
+  "$HOME/.cursor/skills"
+)
 
-# Default target
+declare -a TARGETS
+DRY_RUN=false
+CHECK=false
+
+# Default: ~/.agents/skills only
 TARGETS+=("$HOME/.agents/skills")
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --claude)   TARGETS+=("$HOME/.claude/skills")    ;;
-    --codex)    TARGETS+=("$HOME/.codex/skills")      ;;
-    --cursor)   TARGETS+=("$HOME/.cursor/skills")     ;;
-    --agents)   TARGETS+=("$HOME/.agents/skills")     ;;
-    --all)
-      TARGETS+=("$HOME/.agents/skills")
-      TARGETS+=("$HOME/.claude/skills")
-      TARGETS+=("$HOME/.codex/skills")
-      TARGETS+=("$HOME/.cursor/skills")
+    --agents)   TARGETS+=("$HOME/.agents/skills")              ;;
+    --opencode) TARGETS+=("$HOME/.config/opencode/skills")     ;;
+    --claude)   TARGETS+=("$HOME/.claude/skills")              ;;
+    --codex)    TARGETS+=("$HOME/.codex/skills")               ;;
+    --cursor)   TARGETS+=("$HOME/.cursor/skills")              ;;
+    --global|--all)
+      for t in "${ALL_TARGETS[@]}"; do TARGETS+=("$t"); done
       ;;
+    --check)    CHECK=true; DRY_RUN=true                      ;;
+    --dry-run)  DRY_RUN=true                                   ;;
     --help|-h)
-      echo "Usage: skills-link [--claude] [--codex] [--cursor] [--agents] [--all]"
-      echo "Default: ~/.agents/skills/ (OpenCode)"
+      echo "Usage: skills-link [--agents] [--opencode] [--claude] [--codex] [--cursor] [--global|--all] [--check] [--dry-run]"
+      echo ""
+      echo "  Default:  ~/.agents/skills/ (OpenCode agent skills)"
+      echo "  --global  Link to all known agent directories:"
+      for t in "${ALL_TARGETS[@]}"; do echo "              $t"; done
+      echo "  --check   Verify all skills linked (exit 1 if drift found)"
       exit 0
       ;;
     *)
       echo "Unknown option: $1" >&2
-      echo "Usage: skills-link [--claude] [--codex] [--cursor] [--agents] [--all]" >&2
+      echo "Usage: skills-link [--agents] [--opencode] [--claude] [--codex] [--cursor] [--global|--all] [--check] [--dry-run]" >&2
       exit 1
       ;;
   esac
   shift
 done
 
-# Deduplicate targets
+# Deduplicate (preserve order)
 declare -a UNIQUE
 for t in "${TARGETS[@]}"; do
   seen=false
@@ -63,19 +86,21 @@ for t in "${TARGETS[@]}"; do
   $seen || UNIQUE+=("$t")
 done
 
+EXIT_CODE=0
+
 for TARGET in "${UNIQUE[@]}"; do
   mkdir -p "$TARGET"
 
-  # Cleanup broken symlinks (skills removed from package)
+  # Cleanup stale symlinks (skills removed from package)
   broken=0
   while IFS= read -r -d '' link; do
     if [ ! -e "$link" ]; then
-      rm -f "$link"
+      $DRY_RUN && echo "  [dry-run] rm $link" || rm -f "$link"
       broken=$((broken + 1))
     fi
   done < <(find "$TARGET" -maxdepth 1 -type l -name '*' -print0 2>/dev/null || true)
 
-  # Symlink each skill
+  missing=0
   linked=0
   skipped=0
   migrated=0
@@ -83,20 +108,35 @@ for TARGET in "${UNIQUE[@]}"; do
     [ -d "$skill_dir" ] || continue
     skill_name="$(basename "$skill_dir")"
     link_path="$TARGET/$skill_name"
+    expect_target="$(readlink -f "$skill_dir")"
 
-    # Check if symlink already points to the right place
+    # Already points to the right place
     if [ -L "$link_path" ] && [ "$(readlink "$link_path")" = "$skill_dir" ]; then
       skipped=$((skipped + 1))
       continue
     fi
 
-    # Handle existing entry at link_path
+    # Check mode: symlink is missing or wrong
+    if $CHECK; then
+      if [ ! -e "$link_path" ] && [ ! -L "$link_path" ]; then
+        echo "  MISSING: $link_path → $skill_dir"
+        missing=$((missing + 1))
+      elif [ -L "$link_path" ]; then
+        echo "  WRONG: $link_path → $(readlink "$link_path") (expected $skill_dir)"
+        missing=$((missing + 1))
+      elif [ -d "$link_path" ]; then
+        echo "  COPY (not symlink): $link_path"
+        missing=$((missing + 1))
+      fi
+      continue
+    fi
+
+    # Handle existing entry
     if [ -e "$link_path" ] || [ -L "$link_path" ]; then
       if [ -L "$link_path" ]; then
-        rm -f "$link_path"
+        $DRY_RUN && echo "  [dry-run] rm $link_path" || rm -f "$link_path"
       elif [ -d "$link_path" ] && [ -f "$link_path/SKILL.md" ]; then
-        # Old-style skill directory (copied, not symlinked) — replace with symlink
-        rm -rf "$link_path"
+        $DRY_RUN && echo "  [dry-run] rm -rf $link_path (old copy)" || rm -rf "$link_path"
         migrated=$((migrated + 1))
       else
         echo "  WARN: $link_path exists and is not a symlink — skipping" >&2
@@ -104,9 +144,26 @@ for TARGET in "${UNIQUE[@]}"; do
       fi
     fi
 
-    ln -sf "$skill_dir" "$link_path"
-    linked=$((linked + 1))
+    if $DRY_RUN; then
+      echo "  [dry-run] ln -sf $skill_dir $link_path"
+      linked=$((linked + 1))
+    else
+      ln -sf "$skill_dir" "$link_path"
+      linked=$((linked + 1))
+    fi
   done
 
-  echo "[$TARGET] linked $linked skill(s), $skipped up-to-date, $migrated migrated, $broken stale symlink(s) removed"
+  if $CHECK; then
+    if [ "$missing" -gt 0 ]; then
+      echo "[$TARGET] $missing skill(s) missing or wrong — run 'skills-link --global' to fix"
+      EXIT_CODE=1
+    else
+      echo "[$TARGET] all $skipped skill(s) up-to-date ✓"
+    fi
+  else
+    action=$($DRY_RUN && echo "would link" || echo "linked")
+    echo "[$TARGET] $action $linked skill(s), $skipped up-to-date, $migrated migrated, $broken stale symlink(s) removed"
+  fi
 done
+
+exit $EXIT_CODE
