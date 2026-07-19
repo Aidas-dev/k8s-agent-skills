@@ -66,7 +66,9 @@ jobs:
 
       - name: Read current version
         id: version
-        run: echo "current=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "current=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Auto-bump version (workflow_dispatch)
         if: github.event_name == 'workflow_dispatch'
@@ -74,7 +76,8 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           npm version ${{ inputs.bump }} -m "chore: bump version to %s [skip ci]"
-          echo "new_version=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
         id: bump
 
       # Publish only on tag pushes and workflow_dispatch — NOT on main branch pushes.
