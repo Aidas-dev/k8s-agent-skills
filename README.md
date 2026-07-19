@@ -53,6 +53,9 @@ npx skills-link --dry-run     # preview without linking
 | [external-secrets](skills/external-secrets/SKILL.md) | External Secrets Operator — sync K8s Secrets from Vault, AWS, GCP, Azure | SecretStore, ClusterSecretStore, ExternalSecret, PushSecret |
 | [flagger](skills/flagger/SKILL.md) | Progressive delivery, canary, A/B, blue/green | Canary, MetricTemplate, AlertProvider |
 | [flux](skills/flux/SKILL.md) | Flux CD router — debugging, CRDs, repo audit | Router → sub-skills |
+| [helm](skills/helm/SKILL.md) | Helm router — chart development, production operations, OCI, GitOps, release inspection | Router → sub-skills |
+| [helm-chart](skills/helm-chart/SKILL.md) | Writing Helm charts — anatomy, templates, Go syntax, helpers, values, schema, testing | None |
+| [helm-ops](skills/helm-ops/SKILL.md) | Helm operations — release inspection, OCI, hooks, GitOps, troubleshooting | None |
 | [gitea](skills/gitea/SKILL.md) | Gitea router — API, runner, registry, webhooks, tea CLI | Router → sub-skills |
 | [gitea-api](skills/gitea-api/SKILL.md) | Gitea REST API — auth, repos, issues, PRs, packages | None |
 | [gitea-registry](skills/gitea-registry/SKILL.md) | Gitea container registry — OCI, multi-arch, push/pull | None |
