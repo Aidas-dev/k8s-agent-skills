@@ -11,32 +11,46 @@ Designed for: **Cilium, Talos, Flux, Rook-Ceph, CNPG, ZITADEL, Gitea, Tekton, Ce
 
 ## Quick Start
 
+### As an npm dependency (recommended)
+
 ```bash
-# Install
 npm install --save-dev k8s-agent-skills
 
-# Skills auto-link to ~/.agents/skills/ + ~/.config/opencode/skills/ + ~/.claude/skills/
-# + ~/.codex/skills/ + ~/.cursor/skills/ on install.
-# Just restart your AI agent — skills are ready to use.
+# Skills auto-link on install (postinstall script).
+# Restart your AI agent — ready to use.
 
-# To manually re-link (e.g. after npm update):
+# Re-link after npm update:
 npx skills-link --global
 
-# Check all skills are linked:
+# Verify:
 npx skills-link --global --check
 ```
 
-Skills use **symlinks**, so content always reflects the latest package version. `npm update` + automatic `postinstall` = skills stay current.
-
-### Per-agent linking (manual)
+### From a git clone
 
 ```bash
-npx skills-link               # ~/.agents/skills/ only (default)
-npx skills-link --opencode    # ~/.config/opencode/skills/
-npx skills-link --claude      # ~/.claude/skills/
-npx skills-link --codex       # ~/.codex/skills/
-npx skills-link --cursor      # ~/.cursor/skills/
-npx skills-link --dry-run     # preview without linking
+git clone https://github.com/Aidas-dev/k8s-agent-skills.git
+cd k8s-agent-skills
+./bin/skills-link --global
+
+# Or via npm script:
+npm run skills-link -- --global
+
+# Verify:
+./bin/skills-link --global --check
+```
+
+Skills use **symlinks**, so content always reflects the latest source. `npm update` + automatic `postinstall` = skills stay current.
+
+### Per-agent linking
+
+```bash
+./bin/skills-link               # ~/.agents/skills/ only (default)
+./bin/skills-link --opencode    # ~/.config/opencode/skills/
+./bin/skills-link --claude      # ~/.claude/skills/
+./bin/skills-link --codex       # ~/.codex/skills/
+./bin/skills-link --cursor      # ~/.cursor/skills/
+./bin/skills-link --dry-run     # preview without linking
 ```
 
 ## Skills
@@ -123,19 +137,17 @@ This means:
 - **Skill content updates instantly** on `npm update` — symlinks are live
 - **New skills auto-link** via `postinstall` script on package install
 - **Stale symlinks** (skills removed from a release) are cleaned automatically
-- Run `npx skills-link --global --check` any time to verify
+- Run `./bin/skills-link --global --check` (clone) or `npx skills-link --global --check` (installed) to verify
 
 ## Manual Installation
 
 ```bash
-# git clone (if not using npm)
 git clone https://github.com/Aidas-dev/k8s-agent-skills.git
 cd k8s-agent-skills
 ./bin/skills-link --global
-
-# Or symlink manually
-ln -sf $(pwd)/skills/* ~/.agents/skills/
 ```
+
+`npx skills-link` only works when the package is installed as a dependency (`node_modules/.bin/skills-link` exists). From a clone, use `./bin/skills-link` or `npm run skills-link`.
 
 ## npm Publishing
 

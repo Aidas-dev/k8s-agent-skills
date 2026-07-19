@@ -66,7 +66,8 @@
     "tag": "latest"
   },
   "scripts": {
-    "postinstall": "./bin/skills-link --global --check > /dev/null 2>&1 || ./bin/skills-link --global"
+    "postinstall": "./bin/skills-link --global --check > /dev/null 2>&1 || ./bin/skills-link --global",
+    "skills-link": "./bin/skills-link"
   },
   "engines": {
     "node": ">=18"
