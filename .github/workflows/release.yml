@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,17 +18,17 @@ jobs:
           fetch-depth: 0
 
       - name: Generate release notes
-        id: notes
         run: |
           PREV_TAG=$(git tag --sort=-version:refname | grep '^v' | sed -n '2p')
+          NOTES_FILE=/tmp/release-notes-${{ github.ref_name }}.md
           if [ -n "$PREV_TAG" ]; then
-            echo "notes<<EOF" >> "$GITHUB_OUTPUT"
             git log --oneline --no-decorate "${PREV_TAG}..${GITHUB_REF_NAME}" 2>/dev/null \
-              | sed 's/^/* /' >> "$GITHUB_OUTPUT"
-            echo "EOF" >> "$GITHUB_OUTPUT"
+              | sed 's/^/* /' > "$NOTES_FILE"
           else
-            echo "notes=Initial release ${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "Initial release ${{ github.ref_name }}" > "$NOTES_FILE"
           fi
+          echo "notes-file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
+        id: notes
 
       - name: Create GitHub Release
         env:
@@ -36,5 +37,5 @@ jobs:
           gh release create "${{ github.ref_name }}" \
             --repo "${{ github.repository }}" \
             --title "${{ github.ref_name }}" \
-            --notes "${{ steps.notes.outputs.notes }}" \
+            --notes-file "${{ steps.notes.outputs.notes-file }}" \
             --verify-tag
