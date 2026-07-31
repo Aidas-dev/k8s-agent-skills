@@ -69,6 +69,35 @@ provider "zitadel" {
 | `insecure_skip_verify_tls` | ❌ | Skip TLS verify (dev only) |
 | `transport_headers` | ❌ | Custom headers for proxy auth |
 
+### ⚠️ Gateway gRPC 403 Workaround
+
+> **Not recommended, but confirmed working.** Some ingress gateways (e.g.
+> Cilium Gateway) return 403 for gRPC (`Content-Type: application/grpc`) even
+> with GRPCRoute configured correctly — root cause often undetermined. The
+> provider fails with non-gRPC-compatible responses from the gateway.
+
+Workaround: bypass the gateway via port-forward + PAT + hosts entry:
+
+```bash
+kubectl port-forward -n zitadel svc/zitadel 28080:8080 &
+echo "127.0.0.1 auth.example.com" | sudo tee -a /etc/hosts
+PAT=$(kubectl get secret -n zitadel <pat-secret> -o jsonpath='{.data.pat}' | base64 -d)
+tofu apply -auto-approve \
+  -var="zitadel_domain=auth.example.com" \
+  -var="zitadel_port=28080" \
+  -var="zitadel_insecure=true" \
+  -var="zitadel_access_token=$PAT"
+```
+
+**Gotcha:** provider validates auth during init, before CLI vars resolve —
+`-var="zitadel_access_token=..."` alone fails with "one authentication method
+must be configured". **Hardcode the PAT directly in `providers.tf`** (keep the
+file out of version control), then also pass via CLI so vars don't fail
+validation.
+
+**Gotcha:** `zitadel_system_features` / `zitadel_instance_*` require `system_api`
+auth — PAT fails with `AUTH-5mWD2` even for `IAM_OWNER`. Intentional by design.
+
 ## Resources
 
 ### Organizations
@@ -493,16 +522,62 @@ resource "zitadel_system_features" "cfg" {
 
 ### Actions (Serverless ZITADEL Functions)
 
-| Resource | Description |
-|----------|-------------|
-| `zitadel_action` | Custom action (Go code, triggered by events) |
-| `zitadel_action_target` | Target for action execution (webhook URL) |
-| `zitadel_action_target_public_key` | Public key for payload encryption |
-| `zitadel_action_execution_event` | Trigger action on event |
-| `zitadel_action_execution_function` | Trigger action on function call |
-| `zitadel_action_execution_request` | Trigger action on request |
-| `zitadel_action_execution_response` | Trigger action on response |
-| `zitadel_trigger_actions` | Map triggers to actions (legacy) |
+Three-layer model: **action** = reusable script, **target** = endpoint it calls, **execution** = wiring (which trigger → which targets).
+
+| Resource | Layer | Description |
+|----------|-------|-------------|
+| `zitadel_action` | Action | Go script with restricted `api.*` surface, executed serverless |
+| `zitadel_action_target` | Target | Endpoint (REST_WEBHOOK/REST_CALL/REST_ASYNC) actions call |
+| `zitadel_action_target_public_key` | Target | PEM public key for JWE payload encryption (targets with `PAYLOAD_TYPE_JWE`) |
+| `zitadel_action_execution_event` | Execution | Wire targets to an event, event group, or all events |
+| `zitadel_action_execution_function` | Execution | Wire targets to `preuserinfo` / `preaccesstoken` / `presamlresponse` |
+| `zitadel_action_execution_request` | Execution | Wire targets to a gRPC method or service |
+| `zitadel_action_execution_response` | Execution | Wire targets to a gRPC response |
+| `zitadel_trigger_actions` | Legacy | Old v3 trigger→action mapping (deprecated, use executions) |
+
+```hcl
+# 1. Action script (org-scoped)
+resource "zitadel_action" "enrich_token" {
+  org_id          = zitadel_organization.myapp.id
+  name            = "enrich-token"
+  script          = <<-EOS
+    function enrichToken(ctx, api) {
+      api.v1.user.grant.getAll(...);
+    }
+  EOS
+  timeout         = "10s"
+  allowed_to_fail = false
+}
+
+# 2. Target endpoint
+resource "zitadel_action_target" "enricher" {
+  name               = "token-enricher"
+  endpoint           = "https://svc.example.com/oidc/enrich"
+  target_type        = "REST_CALL"
+  timeout            = "10s"
+  interrupt_on_error = true
+  payload_type       = "PAYLOAD_TYPE_JSON"
+}
+
+# 3. Wiring: run target on OIDC access-token creation
+resource "zitadel_action_execution_function" "token" {
+  name       = "preaccesstoken"
+  target_ids = [zitadel_action_target.enricher.id]
+}
+
+# Event-driven alternative
+resource "zitadel_action_execution_event" "user_added" {
+  event      = "user.human.added"
+  target_ids = [zitadel_action_target.enricher.id]
+}
+
+# JWE payload encryption (optional, for PAYLOAD_TYPE_JWE targets)
+resource "zitadel_action_target_public_key" "enricher_key" {
+  target_id  = zitadel_action_target.enricher.id
+  public_key = file("path/to/public_key.pem")
+  active     = true
+}
+```
 
 ### Message Templates (Instance Defaults)
 
@@ -714,6 +789,12 @@ terraform import zitadel_project.imported '123456789012345678:123456789012345678
 terraform import zitadel_human_user.imported '123456789012345678:123456789012345678:Password1!'
 terraform import zitadel_application_oidc.imported '123456789012345678:123456789012345678:123456789012345678:123456789012345678@zitadel:...'
 terraform import zitadel_system_features.imported 'system'
+terraform import zitadel_action.imported '123456789012345678:123456789012345678'
+terraform import zitadel_action_target.imported '123456789012345678'
+terraform import zitadel_action_execution_event.imported 'event:user.human.added'
+terraform import zitadel_action_execution_function.imported 'preaccesstoken'
+terraform import zitadel_action_execution_request.imported 'method:/zitadel.session.v2.SessionService/ListSessions'
+terraform import zitadel_action_target_public_key.imported '123456789012345678:123456789012345678'
 ```
 
 ## Common Mistakes

@@ -4,10 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-    branches: [main]
-    paths:
-      - 'skills/**'
-      - 'package.json'
   workflow_dispatch:
     inputs:
       bump:
@@ -19,6 +15,11 @@ on:
           - patch
           - minor
           - major
+
+# Serialize publishes — prevents a tag push and workflow_dispatch racing.
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
 
 # Trusted Publishing via OIDC — no NPM_TOKEN secret needed.
 # 1. Package must exist on npmjs.com first
@@ -50,42 +51,20 @@ jobs:
       - name: Upgrade npm (OIDC needs 11.5.1+)
         run: npm install -g npm@latest
 
-      - name: Extract tag version
-        id: tag
-        if: github.ref_type == 'tag'
-        run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Set version from tag
-        if: github.ref_type == 'tag'
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          npm version --allow-same-version "${{ steps.tag.outputs.version }}"
-
-      - name: Read current version
-        id: version
-        run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          echo "current=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Auto-bump version (workflow_dispatch)
+      # Tag path: package.json version must already match the tag (use `npm version` to create it).
+      # Dispatch path: bump first, then publish the bumped version.
+      - name: Bump version (workflow_dispatch only)
         if: github.event_name == 'workflow_dispatch'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          npm version ${{ inputs.bump }} -m "chore: bump version to %s [skip ci]"
-          NEW_VERSION=$(node -p "require('./package.json').version")
-          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          npm version ${{ inputs.bump }} -m "chore: bump version to %s"
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
         id: bump
 
-      # Publish only on tag pushes and workflow_dispatch — NOT on main branch pushes.
-      # This avoids a race where main push publishes before the tag workflow runs.
       - name: Publish to npm with trusted publishing + provenance
-        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
         run: npm publish --provenance --access public
 
       - name: Push version bump commit back
-        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.new_version != ''
+        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.version != ''
         run: git push

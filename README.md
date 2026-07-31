@@ -154,12 +154,12 @@ cd k8s-agent-skills
 Auto-publishes on `v*` tag push via GitHub Actions with OIDC Trusted Publisher — no tokens needed.
 
 ```bash
-npm version patch  # or minor / major
+npm version patch  # or minor / major — creates v-prefixed tag automatically
 git push origin main --tags
 git push github main --tags
 ```
 
-Or manually: `git tag vX.Y.Z && git push origin main --tags && git push github main --tags`.
+**Always use `npm version`**, never `git tag` directly. It ensures the tag points to the right commit and uses the `v` prefix. Don't add `[skip ci]` in the version message — it suppresses the publish workflow. See [CONTRIBUTING.md](CONTRIBUTING.md#release-process) for details.
 
 ## License
 

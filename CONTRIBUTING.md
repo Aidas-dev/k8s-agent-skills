@@ -37,3 +37,26 @@ skills/<name>-<sub>/
 ## npm Package
 
 This repo is published as `@aidas-dev/k8s-agent-skills` on npm. The `bin/skills-link` script handles symlinking skills to agent directories. See [README](README.md#usage) for details.
+
+## Release Process
+
+```bash
+# 1. Bump version and create v-prefixed tag (use npm version, NOT git tag directly)
+npm version patch -m "chore: bump version to %s"
+#    ^ Creates commit + tag vX.Y.Z automatically
+#    ^ WARNING: Do NOT add [skip ci] — that suppresses the publish workflow
+
+# 2. Push to both remotes
+git push origin main --tags
+git push github main --tags
+#    ^ GitHub Actions publishes to npm + creates Release automatically
+```
+
+### Pitfalls to avoid
+
+| Mistake | Consequence |
+|---------|-------------|
+| `git tag 1.8.3` (no `v` prefix) | Workflow filter is `tags: 'v*'` — won't trigger |
+| `npm version patch -m "msg [skip ci]"` | `[skip ci]` skips ALL workflows including tag-triggered ones |
+| `git tag v1.8.5` from wrong commit | Release points to wrong commit. Always use `npm version` which tags HEAD |
+| `git tag -d` + `git tag vX.Y.Z` (manual) | Easy to tag wrong commit. Use `npm version` instead.
