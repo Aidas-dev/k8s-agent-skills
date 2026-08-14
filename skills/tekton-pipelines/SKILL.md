@@ -1,9 +1,11 @@
 ---
-name: tekton
-description: Use when authoring Tekton PipelineRun/TaskRun YAML, configuring resolvers, setting node affinity/nodeSelector for CI workloads, using matrix+param dynamic scheduling, writing when/CEL expressions, or troubleshooting Tekton v1 API patterns.
+name: tekton-pipelines
+description: Authoring Tekton PipelineRun/TaskRun YAML — resolver-based task refs, git auth, node targeting, matrix+param scheduling, when/CEL expressions, finally tasks, timeouts, and troubleshooting tekton.dev/v1 patterns.
 ---
 
-# Tekton Pipelines
+# Tekton Pipelines — Authoring
+
+For installing/configuring Tekton components see `tekton-operator`. For Git-native CI (pipelines in `.tekton/`) see `tekton-pac`.
 
 Kubernetes-native CI/CD. Covers **tekton.dev/v1** patterns.
 
@@ -18,7 +20,7 @@ Kubernetes-native CI/CD. Covers **tekton.dev/v1** patterns.
 - Timeout hierarchy
 - finally tasks
 
-**Not for:** Tekton operator install/upgrade, CRDs, cluster-level config.
+**Not for:** Tekton operator install/upgrade (see `tekton-operator`), Pipelines-as-Code / Git-triggered CI (see `tekton-pac`).
 
 ## Core Patterns
 
