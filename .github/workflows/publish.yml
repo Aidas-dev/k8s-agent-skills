@@ -36,7 +36,47 @@ permissions:
   id-token: write          # Required for OIDC trusted publishing + provenance
 
 jobs:
+  # Dispatch path: bump the version, create the v-prefixed tag, push both.
+  # The tag push then triggers THIS workflow (tag path) + the Release workflow.
+  # Dispatch does NOT publish — avoids double-publish and keeps one flow.
+  bump-and-tag:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+
+      - name: Bump version and create tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          # npm version creates the commit AND the vX.Y.Z tag in one step.
+          # NO [skip ci] — the tag push must trigger the publish workflow.
+          npm version ${{ inputs.bump }} -m "chore: bump version to %s"
+          # Verify the tag actually has the v prefix the workflows filter on.
+          TAG=$(git tag --points-at HEAD)
+          echo "created tag: $TAG"
+          case "$TAG" in
+            v*) ;;
+            *) echo "::error::npm version created tag '$TAG' without v prefix — workflow filter 'v*' won't trigger"; exit 1 ;;
+          esac
+
+      - name: Push commit + tag
+        run: |
+          git push origin main
+          git push origin --tags
+
+  # Tag path: validate package.json matches the tag, then publish.
+  # ONLY the tag push publishes — the dispatch run bumps+tags and ends there,
+  # so its own push of the v* tag (separate run, event=push) does the publish.
+  # This prevents the dispatch run and the tag-triggered run from double-publishing.
   publish:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -51,20 +91,17 @@ jobs:
       - name: Upgrade npm (OIDC needs 11.5.1+)
         run: npm install -g npm@latest
 
-      # Tag path: package.json version must already match the tag (use `npm version` to create it).
-      # Dispatch path: bump first, then publish the bumped version.
-      - name: Bump version (workflow_dispatch only)
-        if: github.event_name == 'workflow_dispatch'
+      # Fail fast if tag and package.json disagree — prevents publishing
+      # the wrong version under a misleading tag (v1.9.0 tag, 1.8.5 package).
+      - name: Validate tag matches package.json version
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          npm version ${{ inputs.bump }} -m "chore: bump version to %s"
-          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
-        id: bump
+          TAG_VERSION="${GITHUB_REF_NAME#v}"   # strip v prefix
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          echo "tag: $TAG_VERSION, package.json: $PKG_VERSION"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::Tag v${TAG_VERSION} does not match package.json version ${PKG_VERSION}. Fix with: npm version ${TAG_VERSION}"
+            exit 1
+          fi
 
       - name: Publish to npm with trusted publishing + provenance
         run: npm publish --provenance --access public
-
-      - name: Push version bump commit back
-        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.version != ''
-        run: git push

@@ -96,6 +96,11 @@ Skills use **symlinks**, so content always reflects the latest source. `npm upda
 | [nextcloud](skills/nextcloud/SKILL.md) | Nextcloud router — Helm deployment, Provisioning API | Router → sub-skills |
 | [nextcloud-helm](skills/nextcloud/nextcloud-helm/SKILL.md) | Nextcloud Helm chart — NC34, S3, Imaginary, Collabora, cron | None |
 | [nextcloud-api](skills/nextcloud/nextcloud-api/SKILL.md) | Nextcloud Provisioning API — users, groups, apps | None |
+| [netbird](skills/netbird/SKILL.md) | NetBird router — server, client CLI, Terraform, K8s operator | Router → sub-skills |
+| [netbird-cli](skills/netbird-cli/SKILL.md) | NetBird client — up/down, status, networks, expose, SSH, k8s | None |
+| [netbird-server](skills/netbird-server/SKILL.md) | NetBird control plane — helmforge chart, config.yaml, DB, Dex IdP, gRPC routing | None |
+| [netbird-terraform](skills/netbird-terraform/SKILL.md) | NetBird Terraform — groups, peers, routes, networks, policies, setup keys, DNS | None |
+| [netbird-operator](skills/netbird-operator/SKILL.md) | NetBird K8s operator — SetupKey, NetworkRouter, NetworkResource, ClusterProxy | 7 CRDs under netbird.io/v1alpha1 |
 | [nvidia-device-plugin](skills/nvidia-device-plugin/SKILL.md) | GPU discovery, GFD, NFD, CDI, MIG, time-slicing | None (ConfigMap) |
 | [rook-ceph](skills/rook-ceph/SKILL.md) | Rook-Ceph router — operator CRDs, toolbox CLI | Router → sub-skills |
 | [rook-ceph-operator](skills/rook-ceph-operator/SKILL.md) | Ceph cluster, block pools, object store, NFS, CSI | CephCluster, CephBlockPool, CephObjectStore, etc. |
@@ -104,8 +109,15 @@ Skills use **symlinks**, so content always reflects the latest source. `npm upda
 | [stakater-reloader](skills/stakater-reloader/SKILL.md) | ConfigMap/Secret reload, annotations, Helm values | None (annotation-based) |
 | [tailscale](skills/tailscale/SKILL.md) | Tailscale router — CLI, status, ping, Talos integration | Router → sub-skills |
 | [tailscale-talos](skills/tailscale/tailscale-talos/SKILL.md) | Tailscale on Talos — system extension, machine config, subnet routes | None |
-| [talos](skills/talos/SKILL.md) | Talos Linux — cluster deploy, machine config, upgrades, talosctl | None |
-| [tekton](skills/tekton/SKILL.md) | Tekton pipelines — resolver refs, matrix, CEL, TTL | Task, Pipeline, etc. |
+| [talos](skills/talos/SKILL.md) | Talos Linux router — CLI ops, machine config, Terraform, tuppr upgrades | Router → sub-skills |
+| [talos-terraform](skills/talos-terraform/SKILL.md) | Talos Terraform provider — machine secrets, config, cluster, upgrades | None |
+| [talosctl](skills/talosctl/SKILL.md) | talosctl CLI — cluster lifecycle, upgrades, diagnostics, etcd | None |
+| [talosconfig](skills/talosconfig/SKILL.md) | Talos machine config — multi-document YAML, generation, patching | None |
+| [tuppr](skills/tuppr/SKILL.md) | tuppr upgrade controller — TalosUpgrade/KubernetesUpgrade CRs, health-gated rollouts | TalosUpgrade, KubernetesUpgrade |
+| [tekton](skills/tekton/SKILL.md) | Tekton router — pipeline authoring, operator, Pipelines-as-Code | Router → sub-skills |
+| [tekton-operator](skills/tekton-operator/SKILL.md) | Tekton operator — TektonConfig, profiles, pruner, Results DB | TektonConfig, TektonPipeline, etc. (operator.tekton.dev) |
+| [tekton-pac](skills/tekton-pac/SKILL.md) | Pipelines-as-Code — .tekton/, Repository CR, ChatOps, tkn pac | Repository (pipelinesascode.tekton.dev) |
+| [tekton-pipelines](skills/tekton-pipelines/SKILL.md) | Tekton pipeline authoring — resolvers, matrix, when/CEL, podTemplate | None |
 | [vault](skills/vault/SKILL.md) | Vault router — Helm, API, Terraform | Router → sub-skills |
 | [vault-api](skills/vault-api/SKILL.md) | Vault REST API — health, init, unseal, auth, KV, policies | None |
 | [vault-helm](skills/vault-helm/SKILL.md) | Vault Helm chart — HA+Raft, injector, storage, TLS, telemetry | None |
@@ -153,13 +165,17 @@ cd k8s-agent-skills
 
 Auto-publishes on `v*` tag push via GitHub Actions with OIDC Trusted Publisher — no tokens needed.
 
+**Easiest: GitHub UI** — Actions → "Publish to npm" → Run workflow → pick `patch`/`minor`/`major`. The workflow bumps the version, creates the tag, and the tag push publishes + creates the GitHub Release.
+
+Or locally:
+
 ```bash
 npm version patch  # or minor / major — creates v-prefixed tag automatically
 git push origin main --tags
 git push github main --tags
 ```
 
-**Always use `npm version`**, never `git tag` directly. It ensures the tag points to the right commit and uses the `v` prefix. Don't add `[skip ci]` in the version message — it suppresses the publish workflow. See [CONTRIBUTING.md](CONTRIBUTING.md#release-process) for details.
+**Always use `npm version`**, never `git tag` directly. It ensures the tag points to the right commit and uses the `v` prefix. Don't add `[skip ci]` in the version message — it suppresses the publish workflow. The workflow also fails fast if the tag and package.json versions disagree. See [CONTRIBUTING.md](CONTRIBUTING.md#release-process) for details.
 
 ## License
 

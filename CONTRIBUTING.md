@@ -40,6 +40,15 @@ This repo is published as `@aidas-dev/k8s-agent-skills` on npm. The `bin/skills-
 
 ## Release Process
 
+**Two paths — both end in the tag push, which is the ONLY thing that publishes.**
+
+### Path A: GitHub UI (recommended, no local git)
+
+Go to Actions → "Publish to npm" → Run workflow → pick `patch`/`minor`/`major`.
+The workflow bumps the version, creates the `vX.Y.Z` tag, pushes both — the tag push then triggers publish + Release automatically.
+
+### Path B: local CLI
+
 ```bash
 # 1. Bump version and create v-prefixed tag (use npm version, NOT git tag directly)
 npm version patch -m "chore: bump version to %s"
@@ -51,6 +60,12 @@ git push origin main --tags
 git push github main --tags
 #    ^ GitHub Actions publishes to npm + creates Release automatically
 ```
+
+### How the publish workflow protects you
+
+- **Tag/version mismatch guard** — if the tag says `v1.9.0` but package.json says `1.8.5`, the workflow fails with a clear error instead of publishing the wrong version.
+- **No double-publish** — dispatch runs only bump+tag; only the tag push event actually publishes.
+- **No `[skip ci]`** in `npm version` messages — the tag push must trigger the workflows.
 
 ### Pitfalls to avoid
 
