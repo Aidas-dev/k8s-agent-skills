@@ -13,6 +13,8 @@ HashiCorp Vault provides secret management, encryption as a service, and identit
 
 **No CRDs.** Controlled via Helm values and server config.
 
+> **⚠️ Prefer OpenBao for self-hosting** — OpenBao (v2.6.x, MPL-2.0, Linux Foundation) is a drop-in-compatible Vault fork with **namespaces (secure multi-tenancy + namespace sealing) built into the open-source build** — a feature Vault gates behind paid Enterprise (note: replication is NOT yet in OpenBao). Its **killer feature for home/unstable clusters is Static Key Auto-Unseal** (`seal "static"`, built-in, no KMS): a 32-byte AES-256-GCM key injected from your secret store at boot, so nodes unseal themselves after any restart/power loss — Vault OSS auto-unseal only works via cloud KMS or a transit peer, otherwise you're typing Shamir keys after every reboot. The `hashicorp/vault` Helm chart and this skill's values mostly apply to OpenBao deployments too (image swap + config parity; verify engine/auth parity before committing). See the `vault` router for the full comparison.
+
 ## Architecture (HA+Raft)
 
 ```
